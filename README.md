@@ -14,7 +14,7 @@ With Yarn :
 yarn add slidemanager
 ```
 
-❗️**Don't forget to import** `hammerjs` **to use** `slidemanager`❗️
+❗️**Don't forget to import** `hammerjs` **to use** `slidemanager`
 
 ## Usage
 ```javascript
@@ -43,7 +43,7 @@ slider.init()
 - *️⃣ `callback` (`function`) : called when user swipes or slide changes
 - 🔄 `loop` (`boolean`) : whether to stop at the last/first slide or not
 - ▶️ `auto` (`boolean`) : automatically switch to the next slide
-- ⏯ `interval` (`number`) : if `auto` is set to `true`, specifies the interval in seconds between each slide change
+- ⏯ `interval` (`number`) : if `auto` is set to `true`, specifies the interval in seconds between each slide change
 - ↕️ `vertical` (`boolean`) : if set to `true`, the swipe movement to change the current slide will be vertical
 
 ### Methods
@@ -51,6 +51,14 @@ slider.init()
 - ⚰️ `destroy` : remove event listeners
 - 🔍 `getIndex` : get the current active index
 - 🚗 `goTo(index)` : goes to the specified index
+
+## Callback
+The `callback` function has one parameter named `event`, here is its structure :
+
+- `event.current` : Current (new) index
+- `event.previous` : Previous index
+- `event.direction` : 1 for next, -1 for previous
+
 
 ## License
 
