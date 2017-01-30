@@ -1,5 +1,5 @@
 {
-  "name": "SlideManager",
+  "name": "slidemanager",
   "version": "0.0.1",
   "description": "Slider manager, inspired by Liqueflies' Slideer and Baptiste Briel's slider-manager",
   "main": "build/SlideManager.js",
