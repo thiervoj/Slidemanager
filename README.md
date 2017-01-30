@@ -1,5 +1,20 @@
-# SlideManager
-Simple slide manager. Inspired by [Slideer](https://github.com/liqueflies/slideer) and Baptiste Briel's [slide-manager](https://github.com/baptistebriel/slider-manager)
+# 👨🏼‍🔧 SlideManager
+Simple slide manager. Inspired by 🦌 [Slideer](https://github.com/liqueflies/slideer) and Baptiste Briel's [slide-manager](https://github.com/baptistebriel/slider-manager)
+
+## Installation
+With npm :
+
+```
+npm install slidemanager
+```
+
+With Yarn :
+
+```
+yarn add slidemanager
+```
+
+❗️**Don't forget to import** `hammerjs` **to use** `slidemanager`❗️
 
 ## Usage
 ```javascript
@@ -25,18 +40,17 @@ slider.init()
 - `el` : slider wrapper element to attach swipe event
 
 ### Options
-- `callback` (`function`) : called when user swipes or slide changes
-- `loop` (`boolean`) : whether to stop at the last/first slide or not
-- `auto` (`boolean`) : automatically switch to the next slide
-- `interval` (`number`) : if `auto` is set to `true`, specifies the interval in seconds between each slide change
-- `vertical` (`boolean`) : if set to `true`, the swipe movement to change the current slide will be vertical
+- *️⃣ `callback` (`function`) : called when user swipes or slide changes
+- 🔄 `loop` (`boolean`) : whether to stop at the last/first slide or not
+- ▶️ `auto` (`boolean`) : automatically switch to the next slide
+- ⏯ `interval` (`number`) : if `auto` is set to `true`, specifies the interval in seconds between each slide change
+- ↕️ `vertical` (`boolean`) : if set to `true`, the swipe movement to change the current slide will be vertical
 
 ### Methods
-- `init` : add event listeners
-- `destroy` : remove event listeners
-- `getIndex` : get the current active index
-- `goTo(index)` : goes to the specified index
-
+- 🛠 `init` : add event listeners
+- ⚰️ `destroy` : remove event listeners
+- 🔍 `getIndex` : get the current active index
+- 🚗 `goTo(index)` : goes to the specified index
 
 ## License
 
