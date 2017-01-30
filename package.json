@@ -1,0 +1,15 @@
+{
+  "name": "SlideManager",
+  "version": "0.0.1",
+  "description": "Slider manager, inspired by Liqueflies' Slideer and Baptiste Briel's slider-manager",
+  "main": "build/SlideManager.js",
+  "repository": {
+    "url": "https://github.com/thiervoj/SlideManager.git",
+    "type": "git"
+  },
+  "author": "Jordan Thiervoz <jordanthiervoz@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "hammerjs": "^2.0.8"
+  }
+}
