@@ -22,9 +22,9 @@ const slides = document.querySelectorAll('.slide')
 const slideWrapper = document.getElementById('gallery')
 
 const slider = new SlideManager(slideWrapper, {
-  callback: function(event) {
+  callback: (event) => {
     const tl = new TimelineLite({
-      onComplete: function() {
+      onComplete: () => {
         slider.changing = false;
       }
     })
