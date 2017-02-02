@@ -31,13 +31,16 @@ class SlideManager {
 		this.raf = null
 	}
 
+
+	// Public functions
+
 	init() {
 		if (this.max === 0) return
 
 		this.hammer = new Hammer.Manager(this.el)
 		this.hammer.add(new Hammer.Swipe({
 			direction: this.options.vertical ? Hammer.DIRECTION_VERTICAL : Hammer.DIRECTION_HORIZONTAL
-		}));
+		}))
 		this.hammer.on('swipe', this.onSwipe)
 
 		if (this.options.auto) this.startAuto()
@@ -51,6 +54,8 @@ class SlideManager {
 		this.hammer.off('swipe', this.onSwipe)
 		this.hammer.destroy()
 		this.hammer = null
+
+		this.changing = false
 
 		cancelAnimationFrame(this.raf)
 		this.raf = null
@@ -79,6 +84,12 @@ class SlideManager {
 	  this.options.callback(event)
 	}
 
+	done() {
+		this.changing = false
+	}
+
+
+	// Private functions
 	startAuto() {
 		this.raf = requestAnimationFrame(this.startAuto.bind(this))
 
@@ -113,7 +124,7 @@ class SlideManager {
 		return {
 			current: newIndex,
 			previous: this.index,
-			direction: newIndex >= this.index ? 1 : -1
+			direction: newIndex > this.index ? 1 : -1
 		}
 	}
 

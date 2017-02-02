@@ -41,6 +41,8 @@ var SlideManager = function () {
 		this.raf = null;
 	}
 
+	// Public functions
+
 	_createClass(SlideManager, [{
 		key: 'init',
 		value: function init() {
@@ -64,6 +66,8 @@ var SlideManager = function () {
 			this.hammer.off('swipe', this.onSwipe);
 			this.hammer.destroy();
 			this.hammer = null;
+
+			this.changing = false;
 
 			cancelAnimationFrame(this.raf);
 			this.raf = null;
@@ -93,6 +97,14 @@ var SlideManager = function () {
 			this.index = checkedIndex;
 			this.options.callback(event);
 		}
+	}, {
+		key: 'done',
+		value: function done() {
+			this.changing = false;
+		}
+
+		// Private functions
+
 	}, {
 		key: 'startAuto',
 		value: function startAuto() {
@@ -134,7 +146,7 @@ var SlideManager = function () {
 			return {
 				current: newIndex,
 				previous: this.index,
-				direction: newIndex >= this.index ? 1 : -1
+				direction: newIndex > this.index ? 1 : -1
 			};
 		}
 	}, {
