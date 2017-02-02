@@ -1,13 +1,13 @@
 {
   "name": "slidemanager",
-  "version": "0.0.2",
-  "description": "Slider manager, inspired by Liqueflies' Slideer and Baptiste Briel's slider-manager",
+  "version": "0.0.3",
+  "description": "Slider manager, inspired by Liqueflies' Slideer 🦌 and Baptiste Briel's slider-manager",
   "main": "build/SlideManager.js",
   "repository": {
     "url": "https://github.com/thiervoj/SlideManager.git",
     "type": "git"
   },
-  "author": "Jordan Thiervoz <jordanthiervoz@gmail.com>",
+  "author": "Jordan Thiervoz <jordanthiervoz@gmail.com> (https://github.com/thiervoj)",
   "license": "MIT",
   "scripts": {
     "uglify": "uglifyjs build/SlideManager.js -cm > build/SlideManager.min.js",
@@ -20,5 +20,9 @@
     "babel-cli": "^6.22.2",
     "babel-preset-es2015": "^6.22.0",
     "uglifyjs": "^2.4.10"
+  },
+  "homepage": "https://github.com/thiervoj/SlideManager",
+  "bugs": {
+    "url": "https://github.com/thiervoj/SlideManager/issues"
   }
 }
