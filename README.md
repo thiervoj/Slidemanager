@@ -24,7 +24,9 @@ const slideWrapper = document.getElementById('gallery')
 const slider = new SlideManager(slideWrapper, {
   callback: (event) => {
     const tl = new TimelineLite({
-      onComplete: () => slider.done() // Call done() when you are done
+      onComplete: () => {
+        slider.done() // Call done() when you are done
+      }
     })
 
     // Your animations here
