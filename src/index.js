@@ -26,7 +26,7 @@ class SlideManager {
 			hammer: true
 		}
 
-		if (opt.hammer == false) this.options.hammer = false
+		if (opt.hammer === false) this.options.hammer = false
 
 		this.hammer = null
 		this.onSwipe = this.onSwipe.bind(this)
@@ -153,3 +153,5 @@ class SlideManager {
 		this.options.callback(event)
 	}
 }
+
+module.exports = SlideManager

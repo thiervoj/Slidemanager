@@ -36,7 +36,7 @@ var SlideManager = function () {
 			hammer: true
 		};
 
-		if (opt.hammer == false) this.options.hammer = false;
+		if (opt.hammer === false) this.options.hammer = false;
 
 		this.hammer = null;
 		this.onSwipe = this.onSwipe.bind(this);
@@ -180,3 +180,5 @@ var SlideManager = function () {
 
 	return SlideManager;
 }();
+
+module.exports = SlideManager;
