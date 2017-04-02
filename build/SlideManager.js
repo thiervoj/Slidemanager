@@ -32,7 +32,8 @@ var SlideManager = function () {
 			vertical: opt.vertical || false,
 			callback: opt.callback,
 			auto: opt.auto || false,
-			interval: opt.interval || 5
+			interval: opt.interval || 5,
+			hammer: opt.hammer ? true : false
 		};
 
 		this.hammer = null;
@@ -43,16 +44,19 @@ var SlideManager = function () {
 
 	// Public functions
 
+
 	_createClass(SlideManager, [{
 		key: 'init',
 		value: function init() {
 			if (this.max === 0) return;
 
-			this.hammer = new Hammer.Manager(this.el);
-			this.hammer.add(new Hammer.Swipe({
-				direction: this.options.vertical ? Hammer.DIRECTION_VERTICAL : Hammer.DIRECTION_HORIZONTAL
-			}));
-			this.hammer.on('swipe', this.onSwipe);
+			if (this.options.hammer) {
+				this.hammer = new Hammer.Manager(this.el);
+				this.hammer.add(new Hammer.Swipe({
+					direction: this.options.vertical ? Hammer.DIRECTION_VERTICAL : Hammer.DIRECTION_HORIZONTAL
+				}));
+				this.hammer.on('swipe', this.onSwipe);
+			}
 
 			if (this.options.auto) this.startAuto();
 
@@ -63,9 +67,11 @@ var SlideManager = function () {
 		value: function destroy() {
 			if (this.max === 0) return;
 
-			this.hammer.off('swipe', this.onSwipe);
-			this.hammer.destroy();
-			this.hammer = null;
+			if (this.options.hammer) {
+				this.hammer.off('swipe', this.onSwipe);
+				this.hammer.destroy();
+				this.hammer = null;
+			}
 
 			this.changing = false;
 
@@ -83,11 +89,10 @@ var SlideManager = function () {
 	}, {
 		key: 'goTo',
 		value: function goTo(index) {
-			if (index == this.index) return;
-			if (this.isChanging()) return;
+			if (index == this.index || this.isChanging()) return;
 
-			var checkedIndex = this.checkLoop(index);
-			var event = this.createEvent(checkedIndex);
+			var checkedIndex = this.checkLoop(index),
+			    event = this.createEvent(checkedIndex);
 
 			if (checkedIndex == this.index) {
 				this.changing = false;
@@ -143,10 +148,14 @@ var SlideManager = function () {
 	}, {
 		key: 'createEvent',
 		value: function createEvent(newIndex) {
+			var direction = newIndex > this.index ? 1 : -1;
+
+			if (this.index == 0 && direction == 1) direction = -1;else if (this.index == this.max && direction == -1) direction = 1;
+
 			return {
 				current: newIndex,
 				previous: this.index,
-				direction: newIndex > this.index ? 1 : -1
+				direction: direction
 			};
 		}
 	}, {
@@ -154,8 +163,8 @@ var SlideManager = function () {
 		value: function callback(delta) {
 			if (this.isChanging()) return;
 
-			var index = this.newIndex(delta);
-			var event = this.createEvent(index);
+			var index = this.newIndex(delta),
+			    event = this.createEvent(index);
 
 			if (index == this.index) {
 				this.changing = false;
