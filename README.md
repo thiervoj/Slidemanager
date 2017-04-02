@@ -18,8 +18,8 @@ yarn add slidemanager
 
 ## Usage
 ```javascript
-const slides = document.querySelectorAll('.slide')
-const slideWrapper = document.getElementById('gallery')
+const slides = document.querySelectorAll('.slide'),
+  slideWrapper = document.getElementById('gallery')
 
 const slider = new SlideManager(slideWrapper, {
   callback: (event) => {
@@ -41,11 +41,12 @@ slider.init()
 
 ### Options
 - ℹ️  `callback` : function called when user swipes or slide changes automatically
-- 🔄  `loop` : whether to stop at the last/first slide or not
-- ▶️  `auto` : set it to `true` to automatically switch to the next slide
-- ⏯  `interval` : specifies the interval in seconds between each slide change. Default is 5. Works when `auto` is set to `true`
-- ↕️  `vertical` : if set to `true`, the swipe movement to change the current slide will need to be vertical
+- 🔄  `loop` : whether to stop at the last/first slide or not. (Default `false`)
+- ▶️  `auto` : set it to `true` to automatically switch to the next slide. (Default `false`)
+- ⏯  `interval` : specifies the interval in seconds between each slide change. Works when `auto` is set to `true`. (Default `5`)
+- ↕️  `vertical` : if set to `true`, the swipe movement to change the current slide will need to be vertical. (Default `false`)
 - 🔢  `length` : number of slides. If not given, The number of slides will be the length of the direct children
+- 🔛  `hammer` : if `false` hammerjs is not needed and the swipe movement detection is disabled. (Default `true`)
 
 ### Methods
 - 🛠  `init` : add event listeners
