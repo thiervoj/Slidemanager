@@ -153,5 +153,4 @@ class SlideManager {
 		this.options.callback(event)
 	}
 }
-
-module.exports = SlideManager
+export default SlideManager;
