@@ -33,8 +33,10 @@ var SlideManager = function () {
 			callback: opt.callback,
 			auto: opt.auto || false,
 			interval: opt.interval || 5,
-			hammer: opt.hammer ? true : false
+			hammer: true
 		};
+
+		if (opt.hammer == false) this.options.hammer = false;
 
 		this.hammer = null;
 		this.onSwipe = this.onSwipe.bind(this);
@@ -150,7 +152,7 @@ var SlideManager = function () {
 		value: function createEvent(newIndex) {
 			var direction = newIndex > this.index ? 1 : -1;
 
-			if (this.index == 0 && direction == 1) direction = -1;else if (this.index == this.max && direction == -1) direction = 1;
+			if (this.index == 0 && newIndex == this.max) direction = -1;else if (this.index == this.max && newIndex == 0) direction = 1;
 
 			return {
 				current: newIndex,
