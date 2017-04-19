@@ -33,6 +33,7 @@ var SlideManager = function () {
 
 		this.options = {
 			loop: opt.loop || false,
+			random: opt.random || false,
 			vertical: opt.vertical || false,
 			callback: opt.callback,
 			auto: opt.auto || false,
@@ -119,14 +120,14 @@ var SlideManager = function () {
 	}, {
 		key: 'startAuto',
 		value: function startAuto() {
-			this.raf = requestAnimationFrame(this.startAuto.bind(this));
-
 			this.counter++;
 
-			if (this.counter > this.options.interval * 60) {
+			if (this.counter >= this.options.interval * 60) {
 				this.callback(-1);
 				this.counter = 0;
 			}
+
+			this.raf = requestAnimationFrame(this.startAuto.bind(this));
 		}
 	}, {
 		key: 'isChanging',
@@ -145,6 +146,17 @@ var SlideManager = function () {
 		key: 'newIndex',
 		value: function newIndex(delta) {
 			return this.checkLoop(delta > 0 ? this.index - 1 : this.index + 1);
+		}
+	}, {
+		key: 'newRandomIndex',
+		value: function newRandomIndex() {
+			var randIndex = void 0;
+
+			do {
+				randIndex = Math.floor(Math.random() * this.max);
+			} while (randIndex == this.index);
+
+			return randIndex;
 		}
 	}, {
 		key: 'checkLoop',
@@ -169,7 +181,7 @@ var SlideManager = function () {
 		value: function callback(delta) {
 			if (this.isChanging()) return;
 
-			var index = this.newIndex(delta),
+			var index = this.options.random ? this.newRandomIndex() : this.newIndex(delta),
 			    event = this.createEvent(index);
 
 			if (index == this.index) {

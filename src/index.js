@@ -19,6 +19,7 @@ class SlideManager {
 
 		this.options = {
 			loop: opt.loop || false,
+			random: opt.random || false,
 			vertical: opt.vertical || false,
 			callback: opt.callback,
 			auto: opt.auto || false,
@@ -96,14 +97,14 @@ class SlideManager {
 
 	// Private functions
 	startAuto() {
-		this.raf = requestAnimationFrame(this.startAuto.bind(this))
-
 		this.counter++
 
-		if (this.counter > this.options.interval * 60) {
+		if (this.counter >= this.options.interval * 60) {
 			this.callback(-1)
 			this.counter = 0
 		}
+
+		this.raf = requestAnimationFrame(this.startAuto.bind(this))
 	}
 
 	isChanging() {
@@ -119,6 +120,16 @@ class SlideManager {
 
 	newIndex(delta) {
 		return this.checkLoop(delta > 0 ? this.index - 1 : this.index + 1)
+	}
+
+	newRandomIndex() {
+		let randIndex
+
+		do {
+			randIndex = Math.floor(Math.random() * this.max)
+		} while (randIndex == this.index)
+
+		return randIndex
 	}
 
 	checkLoop(index) {
@@ -141,7 +152,7 @@ class SlideManager {
 	callback(delta) {
 		if (this.isChanging()) return
 
-		const index = this.newIndex(delta),
+		const index = this.options.random ? this.newRandomIndex() : this.newIndex(delta),
 			event = this.createEvent(index)
 
 		if (index == this.index) {
