@@ -41,6 +41,10 @@ var SlideManager = function () {
 			hammer: true
 		};
 
+		if (opt.startAt != this.index && opt.startAt > 0) {
+			if (opt.startAt > this.max) this.index = this.max;else this.index = opt.startAt;
+		}
+
 		if (opt.hammer === false) this.options.hammer = false;
 
 		this.hammer = null;
