@@ -46,7 +46,9 @@ slider.init()
 - ⏯  `interval` : specifies the interval in seconds between each slide change. Works when `auto` is set to `true`. (Default `5`)
 - ↕️  `vertical` : if set to `true`, the swipe movement to change the current slide will need to be vertical. (Default `false`)
 - 🔢  `length` : number of slides. If not given, The number of slides will be the length of the direct children
-- 🔛  `hammer` : if `false` hammerjs is not needed and the swipe movement detection is disabled. (Default `true`)
+- *️⃣  `hammer` : if `false` hammerjs is not needed and the swipe movement detection is disabled. (Default `true`)
+- 🔀  `random` : Switch to random slides instead of next and previous ones. Enables automatically the `loop` option. (Default `false`)
+- #️⃣  `startAt` : The index from which to start the slider on initialization. (Default `0`)
 
 ### Methods
 - 🛠  `init` : add event listeners
