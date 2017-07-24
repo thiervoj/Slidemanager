@@ -1,5 +1,5 @@
 import { TimelineLite } from './TweenMax.min.js'
-import { SlideManager } from '../build/SlideManager.min.js'
+import SlideManager from '../build/SlideManager.min.js'
 
 document.addEventListener('DOMContentLoaded', () => {
 	let x = 0
@@ -14,11 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
 							message.innerHTML = 'Current : ' + event.current
 						}
 					}),
-					newX = event.direction == 1 ? -500 : 500
+					newX = event.direction === 1 ? -500 : 500
 
 				x += newX
 
-				tl.to(slides, 0.5, { x: x })
+				tl.to(slides, 0.5, { x })
 			}
 		})
 

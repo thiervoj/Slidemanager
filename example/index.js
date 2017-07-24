@@ -5,17 +5,21 @@ function _classCallCheck(t, i) {
 }Object.defineProperty(exports, "__esModule", { value: !0 });var _createClass = function () {
   function t(t, i) {
     for (var s = 0; s < i.length; s++) {
-      var h = i[s];h.enumerable = h.enumerable || !1, h.configurable = !0, "value" in h && (h.writable = !0), Object.defineProperty(t, h.key, h);
+      var e = i[s];e.enumerable = e.enumerable || !1, e.configurable = !0, "value" in e && (e.writable = !0), Object.defineProperty(t, e.key, e);
     }
-  }return function (i, s, h) {
-    return s && t(i.prototype, s), h && t(i, h), i;
+  }return function (i, s, e) {
+    return s && t(i.prototype, s), e && t(i, e), i;
   };
 }(),
-    SlideManager = exports.SlideManager = function () {
+    SlideManager = function () {
   function t(i) {
-    var s = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {};_classCallCheck(this, t), i ? s.callback ? (this.el = i, this.changing = !1, this.index = 0, this.max = s.length || this.el.children.length, this.threshold = s.threshold || 60, this.options = { loop: s.loop || !1, random: s.random || !1, vertical: s.vertical || !1, callback: s.callback, auto: s.auto || !1, interval: s.interval || 5, init: !1 !== s.init, swipe: !1 !== s.swipe }, s.startAt != this.index && s.startAt > 0 && (s.startAt > this.max ? this.index = this.max : this.index = s.startAt), this.onSwipe = this.onSwipe.bind(this), this.counter = 0, this.raf = null, this.touch = { startX: 0, startY: 0, endX: 0, endY: 0 }, this.options.swipe && this.events(), this.options.init && this.init()) : console.error("You must give a callback") : console.error("You must pass an element");
+    var s = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {};_classCallCheck(this, t), i ? s.callback ? (this.el = i, this.changing = !1, this.index = 0, this.max = s.length || this.el.children.length, this.options = { loop: s.loop || !1, random: s.random || !1, vertical: s.vertical || !1, callback: s.callback, auto: s.auto || !1, interval: s.interval || 5, init: s.init || !1, swipe: !1 !== s.swipe, threshold: s.threshold || 60 }, s.startAt != this.index && s.startAt > 0 && (s.startAt > this.max ? this.index = this.max : this.index = s.startAt), this.counter = 0, this.raf = null, this.paused = !1, this.touch = { startX: 0, startY: 0, endX: 0, endY: 0 }, this.options.swipe && this.events(), this.options.init && this.init()) : console.error("You must give a callback") : console.error("You must pass an element");
   }return _createClass(t, [{ key: "init", value: function value() {
       if (0 !== this.max) return this.options.auto && this.startAuto(), this;
+    } }, { key: "pause", value: function value() {
+      this.paused = !0;
+    } }, { key: "resume", value: function value() {
+      this.paused = !1;
     } }, { key: "destroy", value: function value() {
       if (0 !== this.max) return this.changing = !1, this.options.swipe && (this.el.removeEventListener("mousedown", this.touchStart, !1), this.el.removeEventListener("mouseup", this.touchEnd, !1), this.el.removeEventListener("touchstart", this.touchStart, !1), this.el.removeEventListener("touchend", this.touchEnd, !1)), cancelAnimationFrame(this.raf), this.raf = null, this.counter = 0, this;
     } }, { key: "getIndex", value: function value() {
@@ -34,13 +38,11 @@ function _classCallCheck(t, i) {
     } }, { key: "touchEnd", value: function value(t) {
       this.touch.endX = t.screenX, this.touch.endY = t.screenY, this.handleSwipe();
     } }, { key: "handleSwipe", value: function value() {
-      this.options.vertical ? (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.threshold && (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) && this.callback(1), this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.threshold && (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) && this.callback(-1)) : (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.threshold && (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) && this.callback(-1), this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.threshold && (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) && this.callback(1));
+      this.options.vertical ? (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold && (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) && this.callback(1), this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.options.threshold && (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) && this.callback(-1)) : (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.options.threshold && (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) && this.callback(-1), this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.options.threshold && (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) && this.callback(1));
     } }, { key: "startAuto", value: function value() {
-      ++this.counter >= 60 * this.options.interval && (this.callback(-1), this.counter = 0), this.raf = requestAnimationFrame(this.startAuto.bind(this));
+      this.paused || ++this.counter >= 60 * this.options.interval && (this.callback(-1), this.counter = 0), this.raf = requestAnimationFrame(this.startAuto.bind(this));
     } }, { key: "isChanging", value: function value() {
       return !!this.changing || (this.changing = !0, !1);
-    } }, { key: "onSwipe", value: function value(t) {
-      this.callback(this.options.vertical ? t.deltaY : t.deltaX);
     } }, { key: "newIndex", value: function value(t) {
       return this.checkLoop(t > 0 ? this.index - 1 : this.index + 1);
     } }, { key: "newRandomIndex", value: function value() {
@@ -57,7 +59,7 @@ function _classCallCheck(t, i) {
             s = this.createEvent(i);i != this.index ? (this.index = i, this.options.callback(s)) : this.changing = !1;
       }
     } }]), t;
-}();
+}();exports.default = SlideManager;
 
 },{}],2:[function(require,module,exports){
 (function (global){
@@ -2255,12 +2257,16 @@ var _TweenMaxMin = require('./TweenMax.min.js');
 
 var _SlideManagerMin = require('../build/SlideManager.min.js');
 
+var _SlideManagerMin2 = _interopRequireDefault(_SlideManagerMin);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 document.addEventListener('DOMContentLoaded', function () {
 	var x = 0;
 	var slides = document.querySelectorAll('.slide'),
 	    slideWrapper = document.getElementById('gallery'),
 	    message = document.getElementById('message'),
-	    slider = new _SlideManagerMin.SlideManager(slideWrapper, {
+	    slider = new _SlideManagerMin2.default(slideWrapper, {
 		callback: function callback(event) {
 			var tl = new _TweenMaxMin.TimelineLite({
 				onComplete: function onComplete() {
@@ -2268,7 +2274,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					message.innerHTML = 'Current : ' + event.current;
 				}
 			}),
-			    newX = event.direction == 1 ? -500 : 500;
+			    newX = event.direction === 1 ? -500 : 500;
 
 			x += newX;
 

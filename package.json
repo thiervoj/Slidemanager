@@ -12,7 +12,7 @@
   "scripts": {
     "uglify": "uglifyjs build/SlideManager.js -cm > build/SlideManager.min.js",
     "build": "babel src --out-file build/SlideManager.js && npm run uglify",
-    "test": "npm run build && browserify -t [babelify --presets es2015] example/app.js -o example/index.js"
+    "test": "browserify -t [babelify --presets es2015] example/app.js -o example/index.js"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

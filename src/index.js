@@ -1,4 +1,4 @@
-export class SlideManager {
+class SlideManager {
 	constructor(el, opt = {}) {
 		if (!el) {
 			console.error('You must pass an element')
@@ -21,9 +21,9 @@ export class SlideManager {
 			callback: opt.callback,
 			auto: opt.auto || false,
 			interval: opt.interval || 5,
-			init: opt.init === false ? false : true,
+			init: opt.init || false,
 			swipe: opt.swipe === false ? false : true,
-			threshold = opt.threshold || 60
+			threshold: opt.threshold || 60
 		}
 
 		if (opt.startAt != this.index && opt.startAt > 0) {
@@ -33,6 +33,7 @@ export class SlideManager {
 
 		this.counter = 0
 		this.raf = null
+		this.paused = false
 
 		this.touch = {
 			startX: 0,
@@ -42,7 +43,6 @@ export class SlideManager {
 		}
 
 		if (this.options.swipe) this.events()
-
 		if (this.options.init) this.init()
 	}
 
@@ -54,6 +54,14 @@ export class SlideManager {
 		if (this.options.auto) this.startAuto()
 
 		return this
+	}
+
+	pause() {
+		this.paused = true
+	}
+
+	resume() {
+		this.paused = false
 	}
 
 	destroy() {
@@ -148,11 +156,13 @@ export class SlideManager {
 	}
 
 	startAuto() {
-		this.counter++
+		if (!this.paused) {
+			this.counter++
 
-		if (this.counter >= this.options.interval * 60) {
-			this.callback(-1)
-			this.counter = 0
+			if (this.counter >= this.options.interval * 60) {
+				this.callback(-1)
+				this.counter = 0
+			}
 		}
 
 		this.raf = requestAnimationFrame(this.startAuto.bind(this))
@@ -204,6 +214,7 @@ export class SlideManager {
 
 		if (index == this.index) {
 			this.changing = false
+
 			return
 		}
 
@@ -211,3 +222,5 @@ export class SlideManager {
 		this.options.callback(event)
 	}
 }
+
+export { SlideManager as default };

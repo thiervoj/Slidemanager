@@ -8,7 +8,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var SlideManager = exports.SlideManager = function () {
+var SlideManager = function () {
 	function SlideManager(el) {
 		var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -27,7 +27,6 @@ var SlideManager = exports.SlideManager = function () {
 		this.changing = false;
 		this.index = 0;
 		this.max = opt.length || this.el.children.length;
-		this.threshold = opt.threshold || 60;
 
 		this.options = {
 			loop: opt.loop || false,
@@ -36,17 +35,18 @@ var SlideManager = exports.SlideManager = function () {
 			callback: opt.callback,
 			auto: opt.auto || false,
 			interval: opt.interval || 5,
-			init: opt.init === false ? false : true,
-			swipe: opt.swipe === false ? false : true
+			init: opt.init || false,
+			swipe: opt.swipe === false ? false : true,
+			threshold: opt.threshold || 60
 		};
 
 		if (opt.startAt != this.index && opt.startAt > 0) {
 			if (opt.startAt > this.max) this.index = this.max;else this.index = opt.startAt;
 		}
 
-		this.onSwipe = this.onSwipe.bind(this);
 		this.counter = 0;
 		this.raf = null;
+		this.paused = false;
 
 		this.touch = {
 			startX: 0,
@@ -56,7 +56,6 @@ var SlideManager = exports.SlideManager = function () {
 		};
 
 		if (this.options.swipe) this.events();
-
 		if (this.options.init) this.init();
 	}
 
@@ -71,6 +70,16 @@ var SlideManager = exports.SlideManager = function () {
 			if (this.options.auto) this.startAuto();
 
 			return this;
+		}
+	}, {
+		key: 'pause',
+		value: function pause() {
+			this.paused = true;
+		}
+	}, {
+		key: 'resume',
+		value: function resume() {
+			this.paused = false;
 		}
 	}, {
 		key: 'destroy',
@@ -149,23 +158,23 @@ var SlideManager = exports.SlideManager = function () {
 		key: 'handleSwipe',
 		value: function handleSwipe() {
 			if (this.options.vertical) {
-				if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.threshold) {
+				if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold) {
 					if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) {
 						this.callback(1);
 					}
 				}
-				if (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.threshold) {
+				if (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.options.threshold) {
 					if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) {
 						this.callback(-1);
 					}
 				}
 			} else {
-				if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.threshold) {
+				if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.options.threshold) {
 					if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) {
 						this.callback(-1);
 					}
 				}
-				if (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.threshold) {
+				if (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.options.threshold) {
 					if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) {
 						this.callback(1);
 					}
@@ -175,11 +184,13 @@ var SlideManager = exports.SlideManager = function () {
 	}, {
 		key: 'startAuto',
 		value: function startAuto() {
-			this.counter++;
+			if (!this.paused) {
+				this.counter++;
 
-			if (this.counter >= this.options.interval * 60) {
-				this.callback(-1);
-				this.counter = 0;
+				if (this.counter >= this.options.interval * 60) {
+					this.callback(-1);
+					this.counter = 0;
+				}
 			}
 
 			this.raf = requestAnimationFrame(this.startAuto.bind(this));
@@ -191,11 +202,6 @@ var SlideManager = exports.SlideManager = function () {
 
 			this.changing = true;
 			return false;
-		}
-	}, {
-		key: 'onSwipe',
-		value: function onSwipe(event) {
-			this.callback(this.options.vertical ? event.deltaY : event.deltaX);
 		}
 	}, {
 		key: 'newIndex',
@@ -241,6 +247,7 @@ var SlideManager = exports.SlideManager = function () {
 
 			if (index == this.index) {
 				this.changing = false;
+
 				return;
 			}
 
@@ -251,3 +258,5 @@ var SlideManager = exports.SlideManager = function () {
 
 	return SlideManager;
 }();
+
+exports.default = SlideManager;
