@@ -8,7 +8,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var SlideManager = function () {
+var SlideManager = exports.SlideManager = function () {
 	function SlideManager(el) {
 		var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -18,18 +18,16 @@ var SlideManager = function () {
 			console.error('You must pass an element');
 			return;
 		}
-
 		if (!opt.callback) {
 			console.error('You must give a callback');
 			return;
 		}
 
 		this.el = el;
-
 		this.changing = false;
-
 		this.index = 0;
 		this.max = opt.length || this.el.children.length;
+		this.threshold = opt.threshold || 60;
 
 		this.options = {
 			loop: opt.loop || false,
@@ -38,19 +36,28 @@ var SlideManager = function () {
 			callback: opt.callback,
 			auto: opt.auto || false,
 			interval: opt.interval || 5,
-			hammer: true
+			init: opt.init === false ? false : true,
+			swipe: opt.swipe === false ? false : true
 		};
 
 		if (opt.startAt != this.index && opt.startAt > 0) {
 			if (opt.startAt > this.max) this.index = this.max;else this.index = opt.startAt;
 		}
 
-		if (opt.hammer === false) this.options.hammer = false;
-
-		this.hammer = null;
 		this.onSwipe = this.onSwipe.bind(this);
 		this.counter = 0;
 		this.raf = null;
+
+		this.touch = {
+			startX: 0,
+			startY: 0,
+			endX: 0,
+			endY: 0
+		};
+
+		if (this.options.swipe) this.events();
+
+		if (this.options.init) this.init();
 	}
 
 	// Public functions
@@ -61,14 +68,6 @@ var SlideManager = function () {
 		value: function init() {
 			if (this.max === 0) return;
 
-			if (this.options.hammer) {
-				this.hammer = new Hammer.Manager(this.el);
-				this.hammer.add(new Hammer.Swipe({
-					direction: this.options.vertical ? Hammer.DIRECTION_VERTICAL : Hammer.DIRECTION_HORIZONTAL
-				}));
-				this.hammer.on('swipe', this.onSwipe);
-			}
-
 			if (this.options.auto) this.startAuto();
 
 			return this;
@@ -78,13 +77,15 @@ var SlideManager = function () {
 		value: function destroy() {
 			if (this.max === 0) return;
 
-			if (this.options.hammer) {
-				this.hammer.off('swipe', this.onSwipe);
-				this.hammer.destroy();
-				this.hammer = null;
-			}
-
 			this.changing = false;
+
+			if (this.options.swipe) {
+				this.el.removeEventListener('mousedown', this.touchStart, false);
+				this.el.removeEventListener('mouseup', this.touchEnd, false);
+
+				this.el.removeEventListener('touchstart', this.touchStart, false);
+				this.el.removeEventListener('touchend', this.touchEnd, false);
+			}
 
 			cancelAnimationFrame(this.raf);
 			this.raf = null;
@@ -121,6 +122,56 @@ var SlideManager = function () {
 
 		// Private functions
 
+	}, {
+		key: 'events',
+		value: function events() {
+			this.el.addEventListener('mousedown', this.touchStart.bind(this), false);
+			this.el.addEventListener('mouseup', this.touchEnd.bind(this), false);
+
+			this.el.addEventListener('touchstart', this.touchStart.bind(this), false);
+			this.el.addEventListener('touchend', this.touchEnd.bind(this), false);
+		}
+	}, {
+		key: 'touchStart',
+		value: function touchStart(event) {
+			this.touch.startX = event.screenX;
+			this.touch.startY = event.screenY;
+		}
+	}, {
+		key: 'touchEnd',
+		value: function touchEnd(event) {
+			this.touch.endX = event.screenX;
+			this.touch.endY = event.screenY;
+
+			this.handleSwipe();
+		}
+	}, {
+		key: 'handleSwipe',
+		value: function handleSwipe() {
+			if (this.options.vertical) {
+				if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.threshold) {
+					if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) {
+						this.callback(1);
+					}
+				}
+				if (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.threshold) {
+					if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) {
+						this.callback(-1);
+					}
+				}
+			} else {
+				if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.threshold) {
+					if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) {
+						this.callback(-1);
+					}
+				}
+				if (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.threshold) {
+					if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) {
+						this.callback(1);
+					}
+				}
+			}
+		}
 	}, {
 		key: 'startAuto',
 		value: function startAuto() {
@@ -200,5 +251,3 @@ var SlideManager = function () {
 
 	return SlideManager;
 }();
-
-exports.default = SlideManager;
