@@ -133,6 +133,8 @@ class SlideManager {
 	}
 
 	handleSwipe() {
+		if (this.changing) return
+
 		if (this.options.vertical) {
 			if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold) {
 				if ((this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100) || (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100)) {
@@ -167,7 +169,8 @@ class SlideManager {
 			this.counter++
 
 			if (this.counter >= this.options.interval * 60) {
-				this.callback(-1)
+				if (!this.changing) this.callback(-1)
+				
 				this.counter = 0
 			}
 		}
