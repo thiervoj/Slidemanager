@@ -37,7 +37,7 @@ var SlideManager = function () {
 			callback: opt.callback,
 			auto: opt.auto || false,
 			interval: opt.interval || 5,
-			init: opt.init || false,
+			init: opt.init === false ? opt.init : true,
 			swipe: opt.swipe === false ? opt.swipe : true,
 			threshold: opt.threshold || 60
 		};
@@ -57,7 +57,6 @@ var SlideManager = function () {
 			endY: 0
 		};
 
-		if (this.options.swipe) this.events();
 		if (this.options.init) this.init();
 	}
 
@@ -70,6 +69,7 @@ var SlideManager = function () {
 			if (this.max === 0) return null;
 
 			if (this.options.auto) this.startAuto();
+			if (this.options.swipe) this.events();
 
 			return this;
 		}
@@ -163,22 +163,26 @@ var SlideManager = function () {
 			if (this.options.vertical) {
 				if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold) {
 					if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) {
+						this.counter = 0;
 						this.callback(1);
 					}
 				}
 				if (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.options.threshold) {
 					if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) {
+						this.counter = 0;
 						this.callback(-1);
 					}
 				}
 			} else {
 				if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.options.threshold) {
 					if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) {
+						this.counter = 0;
 						this.callback(-1);
 					}
 				}
 				if (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.options.threshold) {
 					if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) {
+						this.counter = 0;
 						this.callback(1);
 					}
 				}
