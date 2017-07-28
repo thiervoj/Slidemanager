@@ -2,10 +2,12 @@ class SlideManager {
 	constructor(el, opt = {}) {
 		if (!el) {
 			console.error('You must pass an element')
+
 			return
 		}
 		if (!opt.callback) {
 			console.error('You must give a callback')
+
 			return
 		}
 
@@ -22,11 +24,11 @@ class SlideManager {
 			auto: opt.auto || false,
 			interval: opt.interval || 5,
 			init: opt.init || false,
-			swipe: opt.swipe === false ? false : true,
+			swipe: opt.swipe === false ? opt.swipe : true,
 			threshold: opt.threshold || 60
 		}
 
-		if (opt.startAt != this.index && opt.startAt > 0) {
+		if (opt.startAt !== this.index && opt.startAt > 0) {
 			if (opt.startAt > this.max) this.index = this.max
 			else this.index = opt.startAt
 		}
@@ -49,7 +51,7 @@ class SlideManager {
 
 	// Public functions
 	init() {
-		if (this.max === 0) return
+		if (this.max === 0) return null
 
 		if (this.options.auto) this.startAuto()
 
@@ -65,7 +67,7 @@ class SlideManager {
 	}
 
 	destroy() {
-		if (this.max === 0) return
+		if (this.max === 0) return null
 
 		this.changing = false
 
@@ -89,18 +91,19 @@ class SlideManager {
 	}
 
 	goTo(index) {
-		if (index == this.index || this.isChanging()) return
+		if (index === this.index || this.isChanging()) return
 
 		const checkedIndex = this.checkLoop(index),
-	  	event = this.createEvent(checkedIndex)
+			event = this.createEvent(checkedIndex)
 
-		if (checkedIndex == this.index) {
+		if (checkedIndex === this.index) {
 			this.changing = false
+
 			return
 		}
 
-	  this.index = checkedIndex
-	  this.options.callback(event)
+		this.index = checkedIndex
+		this.options.callback(event)
 	}
 
 	done() {
@@ -118,13 +121,13 @@ class SlideManager {
 	}
 
 	touchStart(event) {
-		this.touch.startX = event.screenX
-		this.touch.startY = event.screenY
+		this.touch.startX = event.type === 'touchstart' ? event.touches[0].screenX : event.screenX
+		this.touch.startY = event.type === 'touchstart' ? event.touches[0].screenY : event.screenY
 	}
 
 	touchEnd(event) {
-		this.touch.endX = event.screenX
-		this.touch.endY = event.screenY
+		this.touch.endX = event.type === 'touchend' ? event.changedTouches[0].screenX : event.screenX
+		this.touch.endY = event.type === 'touchend' ? event.changedTouches[0].screenY : event.screenY
 
 		this.handleSwipe()
 	}
@@ -172,6 +175,7 @@ class SlideManager {
 		if (this.changing) return true
 
 		this.changing = true
+
 		return false
 	}
 
@@ -184,7 +188,7 @@ class SlideManager {
 
 		do {
 			randIndex = Math.floor(Math.random() * this.max)
-		} while (randIndex == this.index)
+		} while (randIndex === this.index)
 
 		return randIndex
 	}
@@ -196,13 +200,13 @@ class SlideManager {
 	createEvent(newIndex) {
 		let direction = newIndex > this.index ? 1 : -1
 
-		if (this.index == 0 && newIndex == this.max) direction = -1
-		else if (this.index == this.max && newIndex == 0) direction = 1
+		if (this.index === 0 && newIndex === this.max) direction = -1
+		else if (this.index === this.max && newIndex === 0) direction = 1
 
 		return {
 			current: newIndex,
 			previous: this.index,
-			direction: direction
+			direction
 		}
 	}
 
@@ -212,7 +216,7 @@ class SlideManager {
 		const index = this.options.random ? this.newRandomIndex() : this.newIndex(delta),
 			event = this.createEvent(index)
 
-		if (index == this.index) {
+		if (index === this.index) {
 			this.changing = false
 
 			return
