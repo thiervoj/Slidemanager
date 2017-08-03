@@ -66,12 +66,15 @@ class SlideManager {
 
 	resume() {
 		this.paused = false
+
+		this.startAuto()
 	}
 
 	destroy() {
 		if (this.max === 0) return null
 
 		this.changing = false
+		this.paused = false
 
 		if (this.options.swipe) {
 			this.el.removeEventListener('mousedown', this.touchStart, false)
@@ -187,9 +190,9 @@ class SlideManager {
 
 				this.counter = 0
 			}
-		}
 
-		this.raf = requestAnimationFrame(this.startAuto.bind(this))
+			this.raf = requestAnimationFrame(this.startAuto.bind(this))
+		}
 	}
 
 	isChanging() {
