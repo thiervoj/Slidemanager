@@ -44,6 +44,8 @@ class SlideManager {
 			endY: 0
 		}
 
+		this.diagonalMax = 100
+
 		if (this.options.init) this.init()
 	}
 
@@ -132,31 +134,43 @@ class SlideManager {
 		this.handleSwipe()
 	}
 
+	isGoingToX() {
+		if ((this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= this.diagonalMax) || (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= this.diagonalMax)) return true
+
+		return false
+	}
+
+	isGoingToY() {
+		if ((this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= this.diagonalMax) || (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= this.diagonalMax)) return true
+
+		return false
+	}
+
 	handleSwipe() {
 		if (this.changing) return
 
 		if (this.options.vertical) {
 			if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold) {
-				if ((this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100) || (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100)) {
+				if (this.isGoingToX()) {
 					this.counter = 0
 					this.callback(1)
 				}
 			}
 			if (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.options.threshold) {
-				if ((this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100) || (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100)) {
+				if (this.isGoingToX()) {
 					this.counter = 0
 					this.callback(-1)
 				}
 			}
 		} else {
 			if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.options.threshold) {
-				if ((this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100) || (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100)) {
+				if (this.isGoingToY()) {
 					this.counter = 0
 					this.callback(-1)
 				}
 			}
 			if (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.options.threshold) {
-				if ((this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100) || (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100)) {
+				if (this.isGoingToY()) {
 					this.counter = 0
 					this.callback(1)
 				}
@@ -170,7 +184,7 @@ class SlideManager {
 
 			if (this.counter >= this.options.interval * 60) {
 				if (!this.changing) this.callback(-1)
-				
+
 				this.counter = 0
 			}
 		}
