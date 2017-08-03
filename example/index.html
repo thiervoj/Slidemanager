@@ -20,14 +20,17 @@
 		}
 		.slide {
 			position: relative;
-			display: inline-block;
 			width: 500px;
 			height: 450px;
 			top: 50%;
 			transform: translateY(-50%);
+			opacity: 0;
+			display: none;
 		}
 		.slide.first {
 			background: red;
+			display: block;
+			opacity: 1;
 		}
 		.slide.second {
 			background: orange;

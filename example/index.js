@@ -13,7 +13,7 @@ function _classCallCheck(t, i) {
 }(),
     SlideManager = function () {
   function t(i) {
-    var e = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {};_classCallCheck(this, t), i ? e.callback ? (this.el = i, this.changing = !1, this.index = 0, this.max = e.length || this.el.children.length, this.options = { loop: e.loop || !1, random: e.random || !1, vertical: e.vertical || !1, callback: e.callback, auto: e.auto || !1, interval: e.interval || 5, init: !1 !== e.init || e.init, swipe: !1 !== e.swipe || e.swipe, threshold: e.threshold || 60 }, e.startAt !== this.index && e.startAt > 0 && (e.startAt > this.max ? this.index = this.max : this.index = e.startAt), this.counter = 0, this.raf = null, this.paused = !1, this.touch = { startX: 0, startY: 0, endX: 0, endY: 0 }, this.options.init && this.init()) : console.error("You must give a callback") : console.error("You must pass an element");
+    var e = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {};_classCallCheck(this, t), i ? e.callback ? (this.el = i, this.changing = !1, this.index = 0, this.max = e.length || this.el.children.length, this.options = { loop: e.loop || !1, random: e.random || !1, vertical: e.vertical || !1, callback: e.callback, auto: e.auto || !1, interval: e.interval || 5, init: !1 !== e.init || e.init, swipe: !1 !== e.swipe || e.swipe, threshold: e.threshold || 60 }, e.startAt !== this.index && e.startAt > 0 && (e.startAt > this.max ? this.index = this.max : this.index = e.startAt), this.counter = 0, this.raf = null, this.paused = !1, this.touch = { startX: 0, startY: 0, endX: 0, endY: 0 }, this.diagonalMax = 100, this.options.init && this.init()) : console.error("You must give a callback") : console.error("You must pass an element");
   }return _createClass(t, [{ key: "init", value: function value() {
       return 0 === this.max ? null : (this.options.auto && this.startAuto(), this.options.swipe && this.events(), this);
     } }, { key: "pause", value: function value() {
@@ -37,8 +37,12 @@ function _classCallCheck(t, i) {
       this.touch.startX = "touchstart" === t.type ? t.touches[0].screenX : t.screenX, this.touch.startY = "touchstart" === t.type ? t.touches[0].screenY : t.screenY;
     } }, { key: "touchEnd", value: function value(t) {
       this.touch.endX = "touchend" === t.type ? t.changedTouches[0].screenX : t.screenX, this.touch.endY = "touchend" === t.type ? t.changedTouches[0].screenY : t.screenY, this.handleSwipe();
+    } }, { key: "isGoingToX", value: function value() {
+      return this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= this.diagonalMax || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= this.diagonalMax;
+    } }, { key: "isGoingToY", value: function value() {
+      return this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= this.diagonalMax || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= this.diagonalMax;
     } }, { key: "handleSwipe", value: function value() {
-      this.changing || (this.options.vertical ? (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold && (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) && (this.counter = 0, this.callback(1)), this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.options.threshold && (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= 100 || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= 100) && (this.counter = 0, this.callback(-1))) : (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.options.threshold && (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) && (this.counter = 0, this.callback(-1)), this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.options.threshold && (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= 100 || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= 100) && (this.counter = 0, this.callback(1))));
+      this.changing || (this.options.vertical ? (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold && this.isGoingToX() && (this.counter = 0, this.callback(1)), this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.options.threshold && this.isGoingToX() && (this.counter = 0, this.callback(-1))) : (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.options.threshold && this.isGoingToY() && (this.counter = 0, this.callback(-1)), this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.options.threshold && this.isGoingToY() && (this.counter = 0, this.callback(1))));
     } }, { key: "startAuto", value: function value() {
       this.paused || ++this.counter >= 60 * this.options.interval && (this.changing || this.callback(-1), this.counter = 0), this.raf = requestAnimationFrame(this.startAuto.bind(this));
     } }, { key: "isChanging", value: function value() {
@@ -2262,23 +2266,27 @@ var _SlideManagerMin2 = _interopRequireDefault(_SlideManagerMin);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 document.addEventListener('DOMContentLoaded', function () {
-	var x = 0;
 	var slides = document.querySelectorAll('.slide'),
 	    slideWrapper = document.getElementById('gallery'),
 	    message = document.getElementById('message'),
 	    slider = new _SlideManagerMin2.default(slideWrapper, {
+		loop: true,
+		auto: true,
 		callback: function callback(event) {
 			var tl = new _TweenMaxMin.TimelineLite({
 				onComplete: function onComplete() {
 					slider.done();
 					message.innerHTML = 'Current : ' + event.current;
 				}
-			}),
-			    newX = event.direction === 1 ? -500 : 500;
+			});
 
-			x += newX;
-
-			tl.to(slides, 0.5, { x: x });
+			tl.to(slides, 0.5, {
+				alpha: 0,
+				display: 'none'
+			}).to(slides[event.current], 0.5, {
+				display: 'block',
+				alpha: 1
+			});
 		}
 	});
 
