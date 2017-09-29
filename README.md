@@ -49,7 +49,7 @@ const slider = new SlideManager(slideWrapper, {
 - ⏭  `threshold` : Amount of pixels required to change slide when swiping (Default `60`)
 - ⏺  `init` : Whether to init the manager immediately or not. If `false`, call the `.init()` method to initialize the manager. (Default `true`)
 
-### Methods
+## Methods
 - 🛠  `init` : add event listeners. Call this when the `init` option is set to `false`
 - ⚰️  `destroy` : remove event listeners and stops the slider
 - 🔍  `getIndex` : get the current index
@@ -64,6 +64,9 @@ The `callback` function has one parameter named `event` :
 - `event.previous` : Previous index
 - `event.direction` : 1 for next, -1 for previous
 
+## ToDo
+- [ ] add parameter to `goTo` method to disable animation
+- [ ] events not removed after `destroy`
 
 ## License
 
