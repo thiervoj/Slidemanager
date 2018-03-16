@@ -2,32 +2,21 @@
 Simple slide manager 💫 Focused on animations.
 
 ## Installation
-With npm :
-
-```
-npm install slidemanager
-```
-
-With Yarn :
-
 ```
 yarn add slidemanager
 ```
 
 ## Usage
 ```javascript
-const slides = document.querySelectorAll('.slide'),
-  slideWrapper = document.getElementById('gallery')
+const slideWrapper = document.querySelector('#gallery')
 
 const slider = new SlideManager(slideWrapper, {
-  callback: (event) => {
-    const tl = new TimelineLite({
-      onComplete: () => {
-        slider.done() // Call done() when you are done
-      }
-    })
-
+  callback(event) {
     // Your animations here
+    // ...
+
+    // Call done() when your animation is complete
+    this.done()
   }
 })
 ```
@@ -37,7 +26,7 @@ const slider = new SlideManager(slideWrapper, {
 - `el` : slider wrapper element to attach the swipe event
 
 ### Options
-- ℹ️  `callback` : function called when user swipes or slide changes automatically
+- ℹ️  `callback` : function called when user swipes or slide changes automatically. The scope is the slider's scope
 - 🔄  `loop` : whether to stop at the last/first slide or not. (Default `false`)
 - ▶️  `auto` : set it to `true` to automatically switch to the next slide. (Default `false`)
 - ⏯  `interval` : specifies the interval in seconds between each slide change. `auto` must be `true`. (Default `5`)
@@ -50,23 +39,20 @@ const slider = new SlideManager(slideWrapper, {
 - ⏺  `init` : Whether to init the manager immediately or not. If `false`, call the `.init()` method to initialize the manager. (Default `true`)
 
 ## Methods
-- 🛠  `init` : add event listeners. Call this when the `init` option is set to `false`
-- ⚰️  `destroy` : remove event listeners and stops the slider
-- 🔍  `getIndex` : get the current index
-- 🚗  `goTo(index)` : goes to the specified index
-- 🚦  `pause` / `resume` : pauses/resumes the automatic slide switching
-- 👌  `done` : call this function when all your animations are over
+- 🛠  `init` : adds event listeners. Call this when the `init` option is set to `false`
+- ⚰️  `destroy` : removes event listeners and stops the slider
+- 🔍  `getIndex` : gets the current index
+- 🚗  `goTo(index, skipAnims)` : goes to the specified index, you can choose to skip the animations (read the Callback part for details)
+- 🚦  `pause` / `resume` : pauses/resumes the automatic sliding
+- 👌  `done` : call this function when your animations are over
 
 ## Callback
 The `callback` function has one parameter named `event` :
 
-- `event.current` : Current (new) index
+- `event.new` : New index
 - `event.previous` : Previous index
 - `event.direction` : 1 for next, -1 for previous
-
-## ToDo
-- [ ] add parameter to `goTo` method to disable animation
-- [ ] events not removed after `destroy`
+- `event.skipAnims` : true if `skipAnims` has been set to true when calling `goTo()`
 
 ## License
 

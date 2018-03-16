@@ -1,69 +1,329 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-"use strict";
-function _classCallCheck(t, i) {
-  if (!(t instanceof i)) throw new TypeError("Cannot call a class as a function");
-}Object.defineProperty(exports, "__esModule", { value: !0 });var _createClass = function () {
-  function t(t, i) {
-    for (var e = 0; e < i.length; e++) {
-      var s = i[e];s.enumerable = s.enumerable || !1, s.configurable = !0, "value" in s && (s.writable = !0), Object.defineProperty(t, s.key, s);
-    }
-  }return function (i, e, s) {
-    return e && t(i.prototype, e), s && t(i, s), i;
-  };
-}(),
-    SlideManager = function () {
-  function t(i) {
-    var e = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {};_classCallCheck(this, t), i ? e.callback ? (this.el = i, this.changing = !1, this.index = 0, this.max = e.length || this.el.children.length, this.options = { loop: e.loop || !1, random: e.random || !1, vertical: e.vertical || !1, callback: e.callback, auto: e.auto || !1, interval: e.interval || 5, init: !1 !== e.init || e.init, swipe: !1 !== e.swipe || e.swipe, threshold: e.threshold || 60 }, e.startAt !== this.index && e.startAt > 0 && (e.startAt > this.max ? this.index = this.max : this.index = e.startAt), this.counter = 0, this.raf = null, this.paused = !1, this.touch = { startX: 0, startY: 0, endX: 0, endY: 0 }, this.diagonalMax = 100, this.options.init && this.init()) : console.error("You must give a callback") : console.error("You must pass an element");
-  }return _createClass(t, [{ key: "init", value: function value() {
-      return 0 === this.max ? null : (this.options.auto && this.startAuto(), this.options.swipe && this.events(), this);
-    } }, { key: "pause", value: function value() {
-      this.paused = !0;
-    } }, { key: "resume", value: function value() {
-      this.paused = !1;
-    } }, { key: "destroy", value: function value() {
-      return 0 === this.max ? null : (this.changing = !1, this.options.swipe && (this.el.removeEventListener("mousedown", this.touchStart, !1), this.el.removeEventListener("mouseup", this.touchEnd, !1), this.el.removeEventListener("touchstart", this.touchStart, !1), this.el.removeEventListener("touchend", this.touchEnd, !1)), cancelAnimationFrame(this.raf), this.raf = null, this.counter = 0, this);
-    } }, { key: "getIndex", value: function value() {
-      return this.index;
-    } }, { key: "goTo", value: function value(t) {
-      if (t !== this.index && !this.isChanging()) {
-        var i = this.checkLoop(t),
-            e = this.createEvent(i);i !== this.index ? (this.index = i, this.options.callback(e)) : this.changing = !1;
-      }
-    } }, { key: "done", value: function value() {
-      this.changing = !1;
-    } }, { key: "events", value: function value() {
-      this.el.addEventListener("mousedown", this.touchStart.bind(this), !1), this.el.addEventListener("mouseup", this.touchEnd.bind(this), !1), this.el.addEventListener("touchstart", this.touchStart.bind(this), !1), this.el.addEventListener("touchend", this.touchEnd.bind(this), !1);
-    } }, { key: "touchStart", value: function value(t) {
-      this.touch.startX = "touchstart" === t.type ? t.touches[0].screenX : t.screenX, this.touch.startY = "touchstart" === t.type ? t.touches[0].screenY : t.screenY;
-    } }, { key: "touchEnd", value: function value(t) {
-      this.touch.endX = "touchend" === t.type ? t.changedTouches[0].screenX : t.screenX, this.touch.endY = "touchend" === t.type ? t.changedTouches[0].screenY : t.screenY, this.handleSwipe();
-    } }, { key: "isGoingToX", value: function value() {
-      return this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= this.diagonalMax || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= this.diagonalMax;
-    } }, { key: "isGoingToY", value: function value() {
-      return this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= this.diagonalMax || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= this.diagonalMax;
-    } }, { key: "handleSwipe", value: function value() {
-      this.changing || (this.options.vertical ? (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold && this.isGoingToX() && (this.counter = 0, this.callback(1)), this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.options.threshold && this.isGoingToX() && (this.counter = 0, this.callback(-1))) : (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.options.threshold && this.isGoingToY() && (this.counter = 0, this.callback(-1)), this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.options.threshold && this.isGoingToY() && (this.counter = 0, this.callback(1))));
-    } }, { key: "startAuto", value: function value() {
-      this.paused || ++this.counter >= 60 * this.options.interval && (this.changing || this.callback(-1), this.counter = 0), this.raf = requestAnimationFrame(this.startAuto.bind(this));
-    } }, { key: "isChanging", value: function value() {
-      return !!this.changing || (this.changing = !0, !1);
-    } }, { key: "newIndex", value: function value(t) {
-      return this.checkLoop(t > 0 ? this.index - 1 : this.index + 1);
-    } }, { key: "newRandomIndex", value: function value() {
-      var t = void 0;do {
-        t = Math.floor(Math.random() * this.max);
-      } while (t === this.index);return t;
-    } }, { key: "checkLoop", value: function value(t) {
-      return t < 0 ? this.options.loop ? this.max - 1 : 0 : t > this.max - 1 ? this.options.loop ? 0 : this.max - 1 : t;
-    } }, { key: "createEvent", value: function value(t) {
-      var i = t > this.index ? 1 : -1;return 0 === this.index && t === this.max ? i = -1 : this.index === this.max && 0 === t && (i = 1), { current: t, previous: this.index, direction: i };
-    } }, { key: "callback", value: function value(t) {
-      if (!this.isChanging()) {
-        var i = this.options.random ? this.newRandomIndex() : this.newIndex(t),
-            e = this.createEvent(i);i !== this.index ? (this.index = i, this.options.callback(e)) : this.changing = !1;
-      }
-    } }]), t;
-}();exports.default = SlideManager;
+(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _extends = Object.assign || function (target) {
+	for (var i = 1; i < arguments.length; i++) {
+		var source = arguments[i];for (var key in source) {
+			if (Object.prototype.hasOwnProperty.call(source, key)) {
+				target[key] = source[key];
+			}
+		}
+	}return target;
+};
+
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
+
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
+
+var SlideManager = function () {
+	function SlideManager(el) {
+		var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+		_classCallCheck(this, SlideManager);
+
+		if (!el) {
+			console.error('You must pass an element');
+
+			return;
+		}
+		if (!opt.callback) {
+			console.error('You must give a callback');
+
+			return;
+		}
+
+		this.el = el;
+		this.changing = false;
+		this.index = 0;
+		this.max = opt.length || this.el.children.length;
+
+		var defaults = {
+			loop: false,
+			random: false,
+			vertical: false,
+			callback: function callback() {},
+			auto: false,
+			interval: 5,
+			init: true,
+			swipe: true,
+			threshold: 60
+		};
+
+		this.options = _extends(defaults, opt);
+
+		if (opt.startAt !== this.index && opt.startAt > 0) {
+			if (opt.startAt > this.max) this.index = this.max;else this.index = opt.startAt;
+		}
+
+		this.counter = 0;
+		this.raf = null;
+		this.paused = false;
+
+		this.touch = {
+			startX: 0,
+			startY: 0,
+			endX: 0,
+			endY: 0
+		};
+
+		this.diagonalMax = 125;
+
+		this.options.callback = this.options.callback.bind(this);
+		this.touchStart = this.touchStart.bind(this);
+		this.touchEnd = this.touchEnd.bind(this);
+		this.startAuto = this.startAuto.bind(this);
+
+		if (this.options.init) this.init();
+	}
+
+	// Public functions
+
+
+	_createClass(SlideManager, [{
+		key: 'init',
+		value: function init() {
+			if (this.max === 0) return null;
+
+			if (this.options.auto) this.startAuto();
+			if (this.options.swipe) this.events();
+
+			return this;
+		}
+	}, {
+		key: 'pause',
+		value: function pause() {
+			this.paused = true;
+		}
+	}, {
+		key: 'resume',
+		value: function resume() {
+			this.paused = false;
+
+			this.startAuto();
+		}
+	}, {
+		key: 'destroy',
+		value: function destroy() {
+			if (this.max === 0) return null;
+
+			this.changing = false;
+			this.paused = false;
+
+			if (this.options.swipe) {
+				this.el.removeEventListener('mousedown', this.touchStart, false);
+				this.el.removeEventListener('mouseup', this.touchEnd, false);
+
+				this.el.removeEventListener('touchstart', this.touchStart, false);
+				this.el.removeEventListener('touchend', this.touchEnd, false);
+			}
+
+			cancelAnimationFrame(this.raf);
+			this.raf = null;
+			this.counter = 0;
+
+			return this;
+		}
+	}, {
+		key: 'getIndex',
+		value: function getIndex() {
+			return this.index;
+		}
+	}, {
+		key: 'goTo',
+		value: function goTo(index, skipAnims) {
+			if (index === this.index || this.isChanging()) return;
+
+			var checkedIndex = this.checkLoop(index),
+			    event = this.createEvent(checkedIndex, skipAnims);
+
+			if (checkedIndex === this.index) {
+				this.changing = false;
+
+				return;
+			}
+
+			this.index = checkedIndex;
+			this.options.callback(event);
+		}
+	}, {
+		key: 'done',
+		value: function done() {
+			this.changing = false;
+		}
+
+		// Private functions
+
+	}, {
+		key: 'events',
+		value: function events() {
+			this.el.addEventListener('mousedown', this.touchStart, false);
+			this.el.addEventListener('mouseup', this.touchEnd, false);
+
+			this.el.addEventListener('touchstart', this.touchStart, false);
+			this.el.addEventListener('touchend', this.touchEnd, false);
+		}
+	}, {
+		key: 'touchStart',
+		value: function touchStart(event) {
+			this.touch.startX = event.type === 'touchstart' ? event.touches[0].screenX : event.screenX;
+			this.touch.startY = event.type === 'touchstart' ? event.touches[0].screenY : event.screenY;
+		}
+	}, {
+		key: 'touchEnd',
+		value: function touchEnd(event) {
+			this.touch.endX = event.type === 'touchend' ? event.changedTouches[0].screenX : event.screenX;
+			this.touch.endY = event.type === 'touchend' ? event.changedTouches[0].screenY : event.screenY;
+
+			this.handleSwipe();
+		}
+	}, {
+		key: 'isGoingToX',
+		value: function isGoingToX() {
+			if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= this.diagonalMax || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= this.diagonalMax) return true;
+
+			return false;
+		}
+	}, {
+		key: 'isGoingToY',
+		value: function isGoingToY() {
+			if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= this.diagonalMax || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= this.diagonalMax) return true;
+
+			return false;
+		}
+	}, {
+		key: 'handleSwipe',
+		value: function handleSwipe() {
+			if (this.changing) return;
+
+			if (this.options.vertical) {
+				if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold) {
+					if (this.isGoingToX()) {
+						this.counter = 0;
+						this.callback(1);
+					}
+				}
+				if (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.options.threshold) {
+					if (this.isGoingToX()) {
+						this.counter = 0;
+						this.callback(-1);
+					}
+				}
+			} else {
+				if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.options.threshold) {
+					if (this.isGoingToY()) {
+						this.counter = 0;
+						this.callback(-1);
+					}
+				}
+				if (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.options.threshold) {
+					if (this.isGoingToY()) {
+						this.counter = 0;
+						this.callback(1);
+					}
+				}
+			}
+		}
+	}, {
+		key: 'startAuto',
+		value: function startAuto() {
+			if (this.paused) return;
+
+			this.counter++;
+
+			if (this.counter >= this.options.interval * 60) {
+				if (!this.changing) this.callback(-1);
+
+				this.counter = 0;
+			}
+
+			this.raf = requestAnimationFrame(this.startAuto);
+		}
+	}, {
+		key: 'isChanging',
+		value: function isChanging() {
+			if (this.changing) return true;
+
+			this.changing = true;
+
+			return false;
+		}
+	}, {
+		key: 'newIndex',
+		value: function newIndex(delta) {
+			return this.checkLoop(delta > 0 ? this.index - 1 : this.index + 1);
+		}
+	}, {
+		key: 'newRandomIndex',
+		value: function newRandomIndex() {
+			var randIndex = void 0;
+
+			do {
+				randIndex = Math.floor(Math.random() * this.max);
+			} while (randIndex === this.index);
+
+			return randIndex;
+		}
+	}, {
+		key: 'checkLoop',
+		value: function checkLoop(index) {
+			return index < 0 ? this.options.loop ? this.max - 1 : 0 : index > this.max - 1 ? this.options.loop ? 0 : this.max - 1 : index;
+		}
+	}, {
+		key: 'createEvent',
+		value: function createEvent(newIndex) {
+			var skipAnims = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+			var direction = newIndex > this.index ? 1 : -1;
+
+			if (this.index === 0 && newIndex === this.max - 1) direction = -1;else if (this.index === this.max - 1 && newIndex === 0) direction = 1;
+
+			return {
+				new: newIndex,
+				previous: this.index,
+				direction: direction,
+				skipAnims: skipAnims
+			};
+		}
+	}, {
+		key: 'callback',
+		value: function callback(delta) {
+			if (this.isChanging()) return;
+
+			var index = this.options.random ? this.newRandomIndex() : this.newIndex(delta),
+			    event = this.createEvent(index);
+
+			if (index === this.index) {
+				this.changing = false;
+
+				return;
+			}
+
+			if (!this.paused) this.counter = 0;
+			this.index = index;
+			this.options.callback(event);
+		}
+	}]);
+
+	return SlideManager;
+}();
+
+exports.default = SlideManager;
 
 },{}],2:[function(require,module,exports){
 (function (global){
@@ -2259,31 +2519,34 @@ var _gsScope = "undefined" != typeof module && module.exports && "undefined" != 
 
 var _TweenMaxMin = require('./TweenMax.min.js');
 
-var _SlideManagerMin = require('../build/SlideManager.min.js');
+var _SlideManager = require('../build/SlideManager.js');
 
-var _SlideManagerMin2 = _interopRequireDefault(_SlideManagerMin);
+var _SlideManager2 = _interopRequireDefault(_SlideManager);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 document.addEventListener('DOMContentLoaded', function () {
-	var slides = document.querySelectorAll('.slide'),
-	    slideWrapper = document.getElementById('gallery'),
-	    message = document.getElementById('message'),
-	    slider = new _SlideManagerMin2.default(slideWrapper, {
+	var slides = document.querySelectorAll('.slide');
+	var slideWrapper = document.querySelector('#gallery');
+	var message = document.querySelector('#message');
+
+	var slider = new _SlideManager2.default(slideWrapper, {
 		loop: true,
 		auto: true,
 		callback: function callback(event) {
+			var _this = this;
+
 			var tl = new _TweenMaxMin.TimelineLite({
 				onComplete: function onComplete() {
-					slider.done();
-					message.innerHTML = 'Current : ' + event.current;
+					_this.done();
+					message.innerHTML = 'Current : ' + event.new;
 				}
 			});
 
-			tl.to(slides, 0.5, {
+			tl.to(slides[event.previous], 0.5, {
 				alpha: 0,
 				display: 'none'
-			}).to(slides[event.current], 0.5, {
+			}).to(slides[event.new], 0.5, {
 				display: 'block',
 				alpha: 1
 			});
@@ -2293,4 +2556,4 @@ document.addEventListener('DOMContentLoaded', function () {
 	message.innerHTML = 'Current : ' + slider.getIndex();
 });
 
-},{"../build/SlideManager.min.js":1,"./TweenMax.min.js":2}]},{},[3]);
+},{"../build/SlideManager.js":1,"./TweenMax.min.js":2}]},{},[3]);

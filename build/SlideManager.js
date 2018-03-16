@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -30,17 +32,19 @@ var SlideManager = function () {
 		this.index = 0;
 		this.max = opt.length || this.el.children.length;
 
-		this.options = {
-			loop: opt.loop || false,
-			random: opt.random || false,
-			vertical: opt.vertical || false,
-			callback: opt.callback,
-			auto: opt.auto || false,
-			interval: opt.interval || 5,
-			init: opt.init === false ? opt.init : true,
-			swipe: opt.swipe === false ? opt.swipe : true,
-			threshold: opt.threshold || 60
+		var defaults = {
+			loop: false,
+			random: false,
+			vertical: false,
+			callback: function callback() {},
+			auto: false,
+			interval: 5,
+			init: true,
+			swipe: true,
+			threshold: 60
 		};
+
+		this.options = _extends(defaults, opt);
 
 		if (opt.startAt !== this.index && opt.startAt > 0) {
 			if (opt.startAt > this.max) this.index = this.max;else this.index = opt.startAt;
@@ -57,7 +61,12 @@ var SlideManager = function () {
 			endY: 0
 		};
 
-		this.diagonalMax = 100;
+		this.diagonalMax = 125;
+
+		this.options.callback = this.options.callback.bind(this);
+		this.touchStart = this.touchStart.bind(this);
+		this.touchEnd = this.touchEnd.bind(this);
+		this.startAuto = this.startAuto.bind(this);
 
 		if (this.options.init) this.init();
 	}
@@ -84,6 +93,8 @@ var SlideManager = function () {
 		key: 'resume',
 		value: function resume() {
 			this.paused = false;
+
+			this.startAuto();
 		}
 	}, {
 		key: 'destroy',
@@ -91,6 +102,7 @@ var SlideManager = function () {
 			if (this.max === 0) return null;
 
 			this.changing = false;
+			this.paused = false;
 
 			if (this.options.swipe) {
 				this.el.removeEventListener('mousedown', this.touchStart, false);
@@ -113,11 +125,11 @@ var SlideManager = function () {
 		}
 	}, {
 		key: 'goTo',
-		value: function goTo(index) {
+		value: function goTo(index, skipAnims) {
 			if (index === this.index || this.isChanging()) return;
 
 			var checkedIndex = this.checkLoop(index),
-			    event = this.createEvent(checkedIndex);
+			    event = this.createEvent(checkedIndex, skipAnims);
 
 			if (checkedIndex === this.index) {
 				this.changing = false;
@@ -139,11 +151,11 @@ var SlideManager = function () {
 	}, {
 		key: 'events',
 		value: function events() {
-			this.el.addEventListener('mousedown', this.touchStart.bind(this), false);
-			this.el.addEventListener('mouseup', this.touchEnd.bind(this), false);
+			this.el.addEventListener('mousedown', this.touchStart, false);
+			this.el.addEventListener('mouseup', this.touchEnd, false);
 
-			this.el.addEventListener('touchstart', this.touchStart.bind(this), false);
-			this.el.addEventListener('touchend', this.touchEnd.bind(this), false);
+			this.el.addEventListener('touchstart', this.touchStart, false);
+			this.el.addEventListener('touchend', this.touchEnd, false);
 		}
 	}, {
 		key: 'touchStart',
@@ -209,17 +221,17 @@ var SlideManager = function () {
 	}, {
 		key: 'startAuto',
 		value: function startAuto() {
-			if (!this.paused) {
-				this.counter++;
+			if (this.paused) return;
 
-				if (this.counter >= this.options.interval * 60) {
-					if (!this.changing) this.callback(-1);
+			this.counter++;
 
-					this.counter = 0;
-				}
+			if (this.counter >= this.options.interval * 60) {
+				if (!this.changing) this.callback(-1);
+
+				this.counter = 0;
 			}
 
-			this.raf = requestAnimationFrame(this.startAuto.bind(this));
+			this.raf = requestAnimationFrame(this.startAuto);
 		}
 	}, {
 		key: 'isChanging',
@@ -254,14 +266,17 @@ var SlideManager = function () {
 	}, {
 		key: 'createEvent',
 		value: function createEvent(newIndex) {
+			var skipAnims = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
 			var direction = newIndex > this.index ? 1 : -1;
 
-			if (this.index === 0 && newIndex === this.max) direction = -1;else if (this.index === this.max && newIndex === 0) direction = 1;
+			if (this.index === 0 && newIndex === this.max - 1) direction = -1;else if (this.index === this.max - 1 && newIndex === 0) direction = 1;
 
 			return {
-				current: newIndex,
+				new: newIndex,
 				previous: this.index,
-				direction: direction
+				direction: direction,
+				skipAnims: skipAnims
 			};
 		}
 	}, {
@@ -278,6 +293,7 @@ var SlideManager = function () {
 				return;
 			}
 
+			if (!this.paused) this.counter = 0;
 			this.index = index;
 			this.options.callback(event);
 		}

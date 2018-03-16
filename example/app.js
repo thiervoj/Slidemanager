@@ -1,26 +1,27 @@
 import { TimelineLite } from './TweenMax.min.js'
-import SlideManager from '../build/SlideManager.min.js'
+import SlideManager from '../build/SlideManager.js'
 
 document.addEventListener('DOMContentLoaded', () => {
-	const slides = document.querySelectorAll('.slide'),
-		slideWrapper = document.getElementById('gallery'),
-		message = document.getElementById('message'),
-		slider = new SlideManager(slideWrapper, {
+	const slides = document.querySelectorAll('.slide')
+	const slideWrapper = document.querySelector('#gallery')
+	const message = document.querySelector('#message')
+
+	const slider = new SlideManager(slideWrapper, {
 			loop: true,
 			auto: true,
-			callback: (event) => {
+			callback(event) {
 				const tl = new TimelineLite({
 						onComplete: () => {
-							slider.done()
-							message.innerHTML = 'Current : ' + event.current
+							this.done()
+							message.innerHTML = 'Current : ' + event.new
 						}
 					})
 
-				tl.to(slides, 0.5, {
+				tl.to(slides[event.previous], 0.5, {
 						alpha: 0,
 						display: 'none'
 					})
-					.to(slides[event.current], 0.5, {
+					.to(slides[event.new], 0.5, {
 						display: 'block',
 						alpha: 1
 					})

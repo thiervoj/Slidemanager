@@ -1,4 +1,4 @@
-class SlideManager {
+export default class SlideManager {
 	constructor(el, opt = {}) {
 		if (!el) {
 			console.error('You must pass an element')
@@ -16,17 +16,19 @@ class SlideManager {
 		this.index = 0
 		this.max = opt.length || this.el.children.length
 
-		this.options = {
-			loop: opt.loop || false,
-			random: opt.random || false,
-			vertical: opt.vertical || false,
-			callback: opt.callback,
-			auto: opt.auto || false,
-			interval: opt.interval || 5,
-			init: opt.init === false ? opt.init : true,
-			swipe: opt.swipe === false ? opt.swipe : true,
-			threshold: opt.threshold || 60
+		const defaults = {
+			loop: false,
+			random: false,
+			vertical: false,
+			callback: () => {},
+			auto: false,
+			interval: 5,
+			init: true,
+			swipe: true,
+			threshold: 60
 		}
+
+		this.options = Object.assign(defaults, opt)
 
 		if (opt.startAt !== this.index && opt.startAt > 0) {
 			if (opt.startAt > this.max) this.index = this.max
@@ -44,11 +46,15 @@ class SlideManager {
 			endY: 0
 		}
 
-		this.diagonalMax = 100
+		this.diagonalMax = 125
+
+		this.options.callback = this.options.callback.bind(this)
+		this.touchStart = this.touchStart.bind(this)
+		this.touchEnd = this.touchEnd.bind(this)
+		this.startAuto = this.startAuto.bind(this)
 
 		if (this.options.init) this.init()
 	}
-
 
 	// Public functions
 	init() {
@@ -95,11 +101,11 @@ class SlideManager {
 		return this.index
 	}
 
-	goTo(index) {
+	goTo(index, skipAnims) {
 		if (index === this.index || this.isChanging()) return
 
 		const checkedIndex = this.checkLoop(index),
-			event = this.createEvent(checkedIndex)
+			event = this.createEvent(checkedIndex, skipAnims)
 
 		if (checkedIndex === this.index) {
 			this.changing = false
@@ -115,14 +121,13 @@ class SlideManager {
 		this.changing = false
 	}
 
-
 	// Private functions
 	events() {
-		this.el.addEventListener('mousedown', this.touchStart.bind(this), false)
-		this.el.addEventListener('mouseup', this.touchEnd.bind(this), false)
+		this.el.addEventListener('mousedown', this.touchStart, false)
+		this.el.addEventListener('mouseup', this.touchEnd, false)
 
-		this.el.addEventListener('touchstart', this.touchStart.bind(this), false)
-		this.el.addEventListener('touchend', this.touchEnd.bind(this), false)
+		this.el.addEventListener('touchstart', this.touchStart, false)
+		this.el.addEventListener('touchend', this.touchEnd, false)
 	}
 
 	touchStart(event) {
@@ -182,17 +187,17 @@ class SlideManager {
 	}
 
 	startAuto() {
-		if (!this.paused) {
-			this.counter++
+		if (this.paused) return
 
-			if (this.counter >= this.options.interval * 60) {
-				if (!this.changing) this.callback(-1)
+		this.counter++
 
-				this.counter = 0
-			}
+		if (this.counter >= this.options.interval * 60) {
+			if (!this.changing) this.callback(-1)
 
-			this.raf = requestAnimationFrame(this.startAuto.bind(this))
+			this.counter = 0
 		}
+
+		this.raf = requestAnimationFrame(this.startAuto)
 	}
 
 	isChanging() {
@@ -221,16 +226,17 @@ class SlideManager {
 		return index < 0 ? this.options.loop ? this.max - 1 : 0 : index > this.max - 1 ? this.options.loop ? 0 : this.max - 1 : index
 	}
 
-	createEvent(newIndex) {
+	createEvent(newIndex, skipAnims = false) {
 		let direction = newIndex > this.index ? 1 : -1
 
-		if (this.index === 0 && newIndex === this.max) direction = -1
-		else if (this.index === this.max && newIndex === 0) direction = 1
+		if (this.index === 0 && newIndex === this.max - 1) direction = -1
+		else if (this.index === this.max - 1 && newIndex === 0) direction = 1
 
 		return {
-			current: newIndex,
+			new: newIndex,
 			previous: this.index,
-			direction
+			direction,
+			skipAnims
 		}
 	}
 
@@ -246,9 +252,8 @@ class SlideManager {
 			return
 		}
 
+		if (!this.paused) this.counter = 0
 		this.index = index
 		this.options.callback(event)
 	}
 }
-
-export { SlideManager as default };
