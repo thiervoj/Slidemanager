@@ -25,6 +25,7 @@ export default class SlideManager {
 			interval: 5,
 			init: true,
 			swipe: true,
+			mouseSwipe: false,
 			threshold: 60
 		}
 
@@ -83,8 +84,10 @@ export default class SlideManager {
 		this.paused = false
 
 		if (this.options.swipe) {
-			this.el.removeEventListener('mousedown', this.touchStart, false)
-			this.el.removeEventListener('mouseup', this.touchEnd, false)
+			if (this.options.mouseSwipe) {
+				this.el.removeEventListener('mousedown', this.touchStart, false)
+				this.el.removeEventListener('mouseup', this.touchEnd, false)
+			}
 
 			this.el.removeEventListener('touchstart', this.touchStart, false)
 			this.el.removeEventListener('touchend', this.touchEnd, false)
@@ -101,11 +104,19 @@ export default class SlideManager {
 		return this.index
 	}
 
+	prev() {
+		this.goTo(this.index - 1)
+	}
+
+	next() {
+		this.goTo(this.index + 1)
+	}
+
 	goTo(index, skipAnims) {
 		if (index === this.index || this.isChanging()) return
 
-		const checkedIndex = this.checkLoop(index),
-			event = this.createEvent(checkedIndex, skipAnims)
+		const checkedIndex = this.checkLoop(index)
+		const event = this.createEvent(checkedIndex, skipAnims)
 
 		if (checkedIndex === this.index) {
 			this.changing = false
@@ -119,12 +130,16 @@ export default class SlideManager {
 
 	done() {
 		this.changing = false
+
+		if (this.options.auto) this.resume()
 	}
 
 	// Private functions
 	events() {
-		this.el.addEventListener('mousedown', this.touchStart, false)
-		this.el.addEventListener('mouseup', this.touchEnd, false)
+		if (this.options.mouseSwipe) {
+			this.el.addEventListener('mousedown', this.touchStart, false)
+			this.el.addEventListener('mouseup', this.touchEnd, false)
+		}
 
 		this.el.addEventListener('touchstart', this.touchStart, false)
 		this.el.addEventListener('touchend', this.touchEnd, false)
@@ -143,15 +158,11 @@ export default class SlideManager {
 	}
 
 	isGoingToX() {
-		if ((this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= this.diagonalMax) || (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= this.diagonalMax)) return true
-
-		return false
+		return this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= this.diagonalMax || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= this.diagonalMax
 	}
 
 	isGoingToY() {
-		if ((this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= this.diagonalMax) || (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= this.diagonalMax)) return true
-
-		return false
+		return this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= this.diagonalMax || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= this.diagonalMax
 	}
 
 	handleSwipe() {
@@ -159,29 +170,17 @@ export default class SlideManager {
 
 		if (this.options.vertical) {
 			if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold) {
-				if (this.isGoingToX()) {
-					this.counter = 0
-					this.callback(1)
-				}
+				if (this.isGoingToX()) this.callback(-1)
 			}
 			if (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.options.threshold) {
-				if (this.isGoingToX()) {
-					this.counter = 0
-					this.callback(-1)
-				}
+				if (this.isGoingToX()) this.callback(1)
 			}
 		} else {
 			if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.options.threshold) {
-				if (this.isGoingToY()) {
-					this.counter = 0
-					this.callback(-1)
-				}
+				if (this.isGoingToY()) this.callback(-1)
 			}
 			if (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.options.threshold) {
-				if (this.isGoingToY()) {
-					this.counter = 0
-					this.callback(1)
-				}
+				if (this.isGoingToY()) this.callback(1)
 			}
 		}
 	}
@@ -243,8 +242,8 @@ export default class SlideManager {
 	callback(delta) {
 		if (this.isChanging()) return
 
-		const index = this.options.random ? this.newRandomIndex() : this.newIndex(delta),
-			event = this.createEvent(index)
+		const index = this.options.random ? this.newRandomIndex() : this.newIndex(delta)
+		const event = this.createEvent(index)
 
 		if (index === this.index) {
 			this.changing = false
@@ -252,7 +251,11 @@ export default class SlideManager {
 			return
 		}
 
-		if (!this.paused) this.counter = 0
+		if (this.options.auto) {
+			this.pause()
+			this.counter = 0
+		}
+
 		this.index = index
 		this.options.callback(event)
 	}

@@ -33,6 +33,7 @@ const slider = new SlideManager(slideWrapper, {
 - ↕️  `vertical` : if set to `true`, the swipe movement to change the current slide will need to be vertical. (Default `false`)
 - 🔢  `length` : number of slides. If not given, The number of slides will be the number of element's children
 - *️⃣  `swipe` : if `false`, the swipe movement detection is disabled. (Default `true`)
+- 🆗⃣  `mouseSwipe` : Whether the swipe movement must be checked on the mouse or not. (Default `false`)
 - 🔀  `random` : Switch to random slides instead of next and previous ones. Enables automatically the `loop` option. (Default `false`)
 - #️⃣  `startAt` : The index from which to start the slider on initialization. (Default `0`)
 - ⏭  `threshold` : Amount of pixels required to change slide when swiping (Default `60`)
@@ -42,7 +43,9 @@ const slider = new SlideManager(slideWrapper, {
 - 🛠  `init` : adds event listeners. Call this when the `init` option is set to `false`
 - ⚰️  `destroy` : removes event listeners and stops the slider
 - 🔍  `getIndex` : gets the current index
-- 🚗  `goTo(index, skipAnims)` : goes to the specified index, you can choose to skip the animations (read the Callback part for details)
+- 👈  `prev` : goes to the previous slide
+- 👉  `next` : goes to the next slide
+- 🚗  `goTo(index, skipAnims)` : goes to the specified index, you can choose to skip the animations (details in the Callback part below)
 - 🚦  `pause` / `resume` : pauses/resumes the automatic sliding
 - 👌  `done` : call this function when your animations are over
 
