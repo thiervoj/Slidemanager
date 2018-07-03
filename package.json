@@ -1,6 +1,6 @@
 {
   "name": "slidemanager",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "Slider manager 💫 Focused on animations",
   "main": "build/SlideManager.js",
   "repository": {

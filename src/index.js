@@ -1,22 +1,18 @@
 export default class SlideManager {
-	constructor(el, opt = {}) {
-		if (!el) {
-			console.error('You must pass an element')
-
-			return
-		}
+	constructor(opt = {}) {
 		if (!opt.callback) {
 			console.error('You must give a callback')
 
 			return
 		}
 
-		this.el = el
+		this.el = opt.el
 		this.changing = false
 		this.index = 0
-		this.max = opt.length || this.el.children.length
+		this.max = opt.length || this.el ? this.el.children.length : 1
 
 		const defaults = {
+			el: null,
 			loop: false,
 			random: false,
 			vertical: false,
@@ -36,8 +32,7 @@ export default class SlideManager {
 			else this.index = opt.startAt
 		}
 
-		this.counter = 0
-		this.raf = null
+		this.intervalID = null
 		this.paused = false
 
 		this.touch = {
@@ -52,7 +47,6 @@ export default class SlideManager {
 		this.options.callback = this.options.callback.bind(this)
 		this.touchStart = this.touchStart.bind(this)
 		this.touchEnd = this.touchEnd.bind(this)
-		this.startAuto = this.startAuto.bind(this)
 
 		if (this.options.init) this.init()
 	}
@@ -69,6 +63,9 @@ export default class SlideManager {
 
 	pause() {
 		this.paused = true
+
+		clearInterval(this.intervalID)
+		this.intervalID = null
 	}
 
 	resume() {
@@ -83,7 +80,7 @@ export default class SlideManager {
 		this.changing = false
 		this.paused = false
 
-		if (this.options.swipe) {
+		if (this.options.swipe && this.el) {
 			if (this.options.mouseSwipe) {
 				this.el.removeEventListener('mousedown', this.touchStart, false)
 				this.el.removeEventListener('mouseup', this.touchEnd, false)
@@ -93,9 +90,8 @@ export default class SlideManager {
 			this.el.removeEventListener('touchend', this.touchEnd, false)
 		}
 
-		cancelAnimationFrame(this.raf)
-		this.raf = null
-		this.counter = 0
+		clearInterval(this.intervalID)
+		this.intervalID = null
 
 		return this
 	}
@@ -136,6 +132,8 @@ export default class SlideManager {
 
 	// Private functions
 	events() {
+		if (!this.el) return
+
 		if (this.options.mouseSwipe) {
 			this.el.addEventListener('mousedown', this.touchStart, false)
 			this.el.addEventListener('mouseup', this.touchEnd, false)
@@ -186,17 +184,11 @@ export default class SlideManager {
 	}
 
 	startAuto() {
-		if (this.paused) return
+		this.intervalID = setInterval(() => {
+			if (this.paused || this.changing) return
 
-		this.counter++
-
-		if (this.counter >= this.options.interval * 60) {
-			if (!this.changing) this.callback(-1)
-
-			this.counter = 0
-		}
-
-		this.raf = requestAnimationFrame(this.startAuto)
+			this.callback(-1)
+		}, this.options.interval * 1000)
 	}
 
 	isChanging() {
@@ -251,10 +243,7 @@ export default class SlideManager {
 			return
 		}
 
-		if (this.options.auto) {
-			this.pause()
-			this.counter = 0
-		}
+		if (this.options.auto) this.pause()
 
 		this.index = index
 		this.options.callback(event)

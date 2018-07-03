@@ -11,28 +11,24 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SlideManager = function () {
-	function SlideManager(el) {
-		var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	function SlideManager() {
+		var opt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 		_classCallCheck(this, SlideManager);
 
-		if (!el) {
-			console.error('You must pass an element');
-
-			return;
-		}
 		if (!opt.callback) {
 			console.error('You must give a callback');
 
 			return;
 		}
 
-		this.el = el;
+		this.el = opt.el;
 		this.changing = false;
 		this.index = 0;
-		this.max = opt.length || this.el.children.length;
+		this.max = opt.length || this.el ? this.el.children.length : 1;
 
 		var defaults = {
+			el: null,
 			loop: false,
 			random: false,
 			vertical: false,
@@ -51,8 +47,7 @@ var SlideManager = function () {
 			if (opt.startAt > this.max) this.index = this.max;else this.index = opt.startAt;
 		}
 
-		this.counter = 0;
-		this.raf = null;
+		this.intervalID = null;
 		this.paused = false;
 
 		this.touch = {
@@ -67,7 +62,6 @@ var SlideManager = function () {
 		this.options.callback = this.options.callback.bind(this);
 		this.touchStart = this.touchStart.bind(this);
 		this.touchEnd = this.touchEnd.bind(this);
-		this.startAuto = this.startAuto.bind(this);
 
 		if (this.options.init) this.init();
 	}
@@ -89,6 +83,9 @@ var SlideManager = function () {
 		key: 'pause',
 		value: function pause() {
 			this.paused = true;
+
+			clearInterval(this.intervalID);
+			this.intervalID = null;
 		}
 	}, {
 		key: 'resume',
@@ -105,7 +102,7 @@ var SlideManager = function () {
 			this.changing = false;
 			this.paused = false;
 
-			if (this.options.swipe) {
+			if (this.options.swipe && this.el) {
 				if (this.options.mouseSwipe) {
 					this.el.removeEventListener('mousedown', this.touchStart, false);
 					this.el.removeEventListener('mouseup', this.touchEnd, false);
@@ -115,9 +112,8 @@ var SlideManager = function () {
 				this.el.removeEventListener('touchend', this.touchEnd, false);
 			}
 
-			cancelAnimationFrame(this.raf);
-			this.raf = null;
-			this.counter = 0;
+			clearInterval(this.intervalID);
+			this.intervalID = null;
 
 			return this;
 		}
@@ -166,6 +162,8 @@ var SlideManager = function () {
 	}, {
 		key: 'events',
 		value: function events() {
+			if (!this.el) return;
+
 			if (this.options.mouseSwipe) {
 				this.el.addEventListener('mousedown', this.touchStart, false);
 				this.el.addEventListener('mouseup', this.touchEnd, false);
@@ -222,17 +220,13 @@ var SlideManager = function () {
 	}, {
 		key: 'startAuto',
 		value: function startAuto() {
-			if (this.paused) return;
+			var _this = this;
 
-			this.counter++;
+			this.intervalID = setInterval(function () {
+				if (_this.paused || _this.changing) return;
 
-			if (this.counter >= this.options.interval * 60) {
-				if (!this.changing) this.callback(-1);
-
-				this.counter = 0;
-			}
-
-			this.raf = requestAnimationFrame(this.startAuto);
+				_this.callback(-1);
+			}, this.options.interval * 1000);
 		}
 	}, {
 		key: 'isChanging',
@@ -294,10 +288,7 @@ var SlideManager = function () {
 				return;
 			}
 
-			if (this.options.auto) {
-				this.pause();
-				this.counter = 0;
-			}
+			if (this.options.auto) this.pause();
 
 			this.index = index;
 			this.options.callback(event);

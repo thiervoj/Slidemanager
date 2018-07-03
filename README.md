@@ -10,7 +10,8 @@ yarn add slidemanager
 ```javascript
 const slideWrapper = document.querySelector('#gallery')
 
-const slider = new SlideManager(slideWrapper, {
+const slider = new SlideManager({
+  el: slideWrapper,
   callback(event) {
     // Your animations here
     // ...
@@ -22,18 +23,16 @@ const slider = new SlideManager(slideWrapper, {
 ```
 
 ## Parameters
-### Element
-- `el` : slider wrapper element to attach the swipe event
-
 ### Options
+- 🖼  `el` : DOM element to attach the swipe event. If not given, please provide a `length` parameter
 - ℹ️  `callback` : function called when user swipes or slide changes automatically. The scope is the slider's scope
 - 🔄  `loop` : whether to stop at the last/first slide or not. (Default `false`)
 - ▶️  `auto` : set it to `true` to automatically switch to the next slide. (Default `false`)
 - ⏯  `interval` : specifies the interval in seconds between each slide change. `auto` must be `true`. (Default `5`)
 - ↕️  `vertical` : if set to `true`, the swipe movement to change the current slide will need to be vertical. (Default `false`)
-- 🔢  `length` : number of slides. If not given, The number of slides will be the number of element's children
+- 🔢  `length` : number of slides. If not given, The number of slides will be the number of `el`'s children
 - *️⃣  `swipe` : if `false`, the swipe movement detection is disabled. (Default `true`)
-- 🆗⃣  `mouseSwipe` : Whether the swipe movement must be checked on the mouse or not. (Default `false`)
+- 🈁  `mouseSwipe` : Whether the swipe movement must be checked on the mouse or not. (Default `false`)
 - 🔀  `random` : Switch to random slides instead of next and previous ones. Enables automatically the `loop` option. (Default `false`)
 - #️⃣  `startAt` : The index from which to start the slider on initialization. (Default `0`)
 - ⏭  `threshold` : Amount of pixels required to change slide when swiping (Default `60`)
