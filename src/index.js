@@ -72,15 +72,10 @@ export default class SlideManager {
 
 	pause() {
 		this.paused = true
-
-		clearInterval(this.intervalID)
-		this.intervalID = null
 	}
 
 	resume() {
 		this.paused = false
-
-		this.startAuto()
 	}
 
 	destroy() {

@@ -91,16 +91,11 @@ var SlideManager = function () {
 		key: 'pause',
 		value: function pause() {
 			this.paused = true;
-
-			clearInterval(this.intervalID);
-			this.intervalID = null;
 		}
 	}, {
 		key: 'resume',
 		value: function resume() {
 			this.paused = false;
-
-			this.startAuto();
 		}
 	}, {
 		key: 'destroy',
