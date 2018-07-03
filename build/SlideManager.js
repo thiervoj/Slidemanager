@@ -25,7 +25,15 @@ var SlideManager = function () {
 		this.el = opt.el;
 		this.changing = false;
 		this.index = 0;
-		this.max = opt.length || this.el ? this.el.children.length : 1;
+		this.max = -1;
+
+		if (opt.length > 0) this.max = opt.length;else if (this.el.children) this.max = this.el.children.length;
+
+		if (this.max === -1) {
+			console.error('You must give an element or a length');
+
+			return;
+		}
 
 		var defaults = {
 			el: null,
