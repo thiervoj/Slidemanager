@@ -137,11 +137,11 @@ var SlideManager = function () {
 		}
 	}, {
 		key: 'goTo',
-		value: function goTo(index, skipAnims) {
+		value: function goTo(index, data) {
 			if (index === this.index || this.isChanging()) return;
 
 			var checkedIndex = this.checkLoop(index);
-			var event = this.createEvent(checkedIndex, skipAnims);
+			var event = this.createEvent(checkedIndex, data);
 
 			if (checkedIndex === this.index) {
 				this.changing = false;
@@ -264,17 +264,19 @@ var SlideManager = function () {
 	}, {
 		key: 'createEvent',
 		value: function createEvent(newIndex) {
-			var skipAnims = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+			var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 			var direction = newIndex > this.index ? 1 : -1;
 
-			if (this.index === 0 && newIndex === this.max - 1) direction = -1;else if (this.index === this.max - 1 && newIndex === 0) direction = 1;
+			if (this.max > 2) {
+				if (this.index === 0 && newIndex === this.max - 1) direction = -1;else if (this.index === this.max - 1 && newIndex === 0) direction = 1;
+			}
 
 			return {
 				new: newIndex,
 				previous: this.index,
 				direction: direction,
-				skipAnims: skipAnims
+				data: data
 			};
 		}
 	}, {

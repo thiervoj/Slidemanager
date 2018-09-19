@@ -8,6 +8,8 @@ yarn add slidemanager
 
 ## Usage
 ```javascript
+import SlideManager from 'slidemanager'
+
 const slideWrapper = document.querySelector('#gallery')
 
 const slider = new SlideManager({
@@ -44,7 +46,7 @@ const slider = new SlideManager({
 - 🔍  `getIndex` : gets the current index
 - 👈  `prev` : goes to the previous slide
 - 👉  `next` : goes to the next slide
-- 🚗  `goTo(index, skipAnims)` : goes to the specified index, you can choose to skip the animations (details in the Callback part below)
+- 🚗  `goTo(index, data)` : goes to the specified index, you can pass data which can be recovered in the callback
 - 🚦  `pause` / `resume` : pauses/resumes the automatic sliding
 - 👌  `done` : call this function when your animations are over
 
@@ -54,7 +56,7 @@ The `callback` function has one parameter named `event` :
 - `event.new` : New index
 - `event.previous` : Previous index
 - `event.direction` : 1 for next, -1 for previous
-- `event.skipAnims` : true if `skipAnims` has been set to true when calling `goTo()`
+- `event.data` : some data given when `goTo()` is called
 
 ## License
 

@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	const slideWrapper = document.querySelector('#gallery')
 	const message = document.querySelector('#message')
 
-	const slider = new SlideManager(slideWrapper, {
+	const slider = new SlideManager({
+			el: slideWrapper,
 			loop: true,
 			auto: true,
 			callback(event) {

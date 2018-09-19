@@ -112,11 +112,11 @@ export default class SlideManager {
 		this.goTo(this.index + 1)
 	}
 
-	goTo(index, skipAnims) {
+	goTo(index, data) {
 		if (index === this.index || this.isChanging()) return
 
 		const checkedIndex = this.checkLoop(index)
-		const event = this.createEvent(checkedIndex, skipAnims)
+		const event = this.createEvent(checkedIndex, data)
 
 		if (checkedIndex === this.index) {
 			this.changing = false
@@ -221,17 +221,19 @@ export default class SlideManager {
 		return index < 0 ? this.options.loop ? this.max - 1 : 0 : index > this.max - 1 ? this.options.loop ? 0 : this.max - 1 : index
 	}
 
-	createEvent(newIndex, skipAnims = false) {
+	createEvent(newIndex, data = {}) {
 		let direction = newIndex > this.index ? 1 : -1
 
-		if (this.index === 0 && newIndex === this.max - 1) direction = -1
-		else if (this.index === this.max - 1 && newIndex === 0) direction = 1
+		if (this.max > 2) {
+			if (this.index === 0 && newIndex === this.max - 1) direction = -1
+			else if (this.index === this.max - 1 && newIndex === 0) direction = 1
+		}
 
 		return {
 			new: newIndex,
 			previous: this.index,
 			direction,
-			skipAnims
+			data
 		}
 	}
 
