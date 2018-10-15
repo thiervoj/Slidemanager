@@ -42,7 +42,6 @@ export default class SlideManager {
 		}
 
 		this.intervalID = null
-		this.paused = false
 
 		this.touch = {
 			startX: 0,
@@ -70,19 +69,10 @@ export default class SlideManager {
 		return this
 	}
 
-	pause() {
-		this.paused = true
-	}
-
-	resume() {
-		this.paused = false
-	}
-
 	destroy() {
 		if (this.max === 0) return null
 
 		this.changing = false
-		this.paused = false
 
 		if (this.options.swipe && this.el) {
 			if (this.options.mouseSwipe) {
@@ -94,8 +84,7 @@ export default class SlideManager {
 			this.el.removeEventListener('touchend', this.touchEnd, false)
 		}
 
-		clearInterval(this.intervalID)
-		this.intervalID = null
+		if (this.options.auto) this.stopAuto()
 
 		return this
 	}
@@ -131,7 +120,7 @@ export default class SlideManager {
 	done() {
 		this.changing = false
 
-		if (this.options.auto) this.resume()
+		if (this.options.auto) this.startAuto()
 	}
 
 	// Private functions
@@ -189,10 +178,16 @@ export default class SlideManager {
 
 	startAuto() {
 		this.intervalID = setInterval(() => {
-			if (this.paused || this.changing) return
+			if (this.changing) return
 
 			this.callback(-1)
 		}, this.options.interval * 1000)
+	}
+
+	stopAuto() {
+		clearInterval(this.intervalID)
+
+		this.intervalID = null
 	}
 
 	isChanging() {
@@ -249,7 +244,7 @@ export default class SlideManager {
 			return
 		}
 
-		if (this.options.auto) this.pause()
+		if (this.options.auto) this.stopAuto()
 
 		this.index = index
 		this.options.callback(event)
