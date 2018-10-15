@@ -56,7 +56,6 @@ var SlideManager = function () {
 		}
 
 		this.intervalID = null;
-		this.paused = false;
 
 		this.touch = {
 			startX: 0,
@@ -88,22 +87,11 @@ var SlideManager = function () {
 			return this;
 		}
 	}, {
-		key: 'pause',
-		value: function pause() {
-			this.paused = true;
-		}
-	}, {
-		key: 'resume',
-		value: function resume() {
-			this.paused = false;
-		}
-	}, {
 		key: 'destroy',
 		value: function destroy() {
 			if (this.max === 0) return null;
 
 			this.changing = false;
-			this.paused = false;
 
 			if (this.options.swipe && this.el) {
 				if (this.options.mouseSwipe) {
@@ -115,8 +103,7 @@ var SlideManager = function () {
 				this.el.removeEventListener('touchend', this.touchEnd, false);
 			}
 
-			clearInterval(this.intervalID);
-			this.intervalID = null;
+			if (this.options.auto) this.stopAuto();
 
 			return this;
 		}
@@ -157,7 +144,7 @@ var SlideManager = function () {
 		value: function done() {
 			this.changing = false;
 
-			if (this.options.auto) this.resume();
+			if (this.options.auto) this.startAuto();
 		}
 
 		// Private functions
@@ -226,10 +213,17 @@ var SlideManager = function () {
 			var _this = this;
 
 			this.intervalID = setInterval(function () {
-				if (_this.paused || _this.changing) return;
+				if (_this.changing) return;
 
 				_this.callback(-1);
 			}, this.options.interval * 1000);
+		}
+	}, {
+		key: 'stopAuto',
+		value: function stopAuto() {
+			clearInterval(this.intervalID);
+
+			this.intervalID = null;
 		}
 	}, {
 		key: 'isChanging',
@@ -293,7 +287,7 @@ var SlideManager = function () {
 				return;
 			}
 
-			if (this.options.auto) this.pause();
+			if (this.options.auto) this.stopAuto();
 
 			this.index = index;
 			this.options.callback(event);

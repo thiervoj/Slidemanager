@@ -1,4 +1,4 @@
-(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -32,28 +32,32 @@ function _classCallCheck(instance, Constructor) {
 }
 
 var SlideManager = function () {
-	function SlideManager(el) {
-		var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	function SlideManager() {
+		var opt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 		_classCallCheck(this, SlideManager);
 
-		if (!el) {
-			console.error('You must pass an element');
-
-			return;
-		}
 		if (!opt.callback) {
 			console.error('You must give a callback');
 
 			return;
 		}
 
-		this.el = el;
+		this.el = opt.el;
 		this.changing = false;
 		this.index = 0;
-		this.max = opt.length || this.el.children.length;
+		this.max = -1;
+
+		if (opt.length > 0) this.max = opt.length;else if (this.el.children) this.max = this.el.children.length;
+
+		if (this.max === -1) {
+			console.error('You must give an element or a length');
+
+			return;
+		}
 
 		var defaults = {
+			el: null,
 			loop: false,
 			random: false,
 			vertical: false,
@@ -62,6 +66,7 @@ var SlideManager = function () {
 			interval: 5,
 			init: true,
 			swipe: true,
+			mouseSwipe: false,
 			threshold: 60
 		};
 
@@ -71,9 +76,7 @@ var SlideManager = function () {
 			if (opt.startAt > this.max) this.index = this.max;else this.index = opt.startAt;
 		}
 
-		this.counter = 0;
-		this.raf = null;
-		this.paused = false;
+		this.intervalID = null;
 
 		this.touch = {
 			startX: 0,
@@ -87,7 +90,6 @@ var SlideManager = function () {
 		this.options.callback = this.options.callback.bind(this);
 		this.touchStart = this.touchStart.bind(this);
 		this.touchEnd = this.touchEnd.bind(this);
-		this.startAuto = this.startAuto.bind(this);
 
 		if (this.options.init) this.init();
 	}
@@ -106,36 +108,23 @@ var SlideManager = function () {
 			return this;
 		}
 	}, {
-		key: 'pause',
-		value: function pause() {
-			this.paused = true;
-		}
-	}, {
-		key: 'resume',
-		value: function resume() {
-			this.paused = false;
-
-			this.startAuto();
-		}
-	}, {
 		key: 'destroy',
 		value: function destroy() {
 			if (this.max === 0) return null;
 
 			this.changing = false;
-			this.paused = false;
 
-			if (this.options.swipe) {
-				this.el.removeEventListener('mousedown', this.touchStart, false);
-				this.el.removeEventListener('mouseup', this.touchEnd, false);
+			if (this.options.swipe && this.el) {
+				if (this.options.mouseSwipe) {
+					this.el.removeEventListener('mousedown', this.touchStart, false);
+					this.el.removeEventListener('mouseup', this.touchEnd, false);
+				}
 
 				this.el.removeEventListener('touchstart', this.touchStart, false);
 				this.el.removeEventListener('touchend', this.touchEnd, false);
 			}
 
-			cancelAnimationFrame(this.raf);
-			this.raf = null;
-			this.counter = 0;
+			if (this.options.auto) this.stopAuto();
 
 			return this;
 		}
@@ -145,12 +134,22 @@ var SlideManager = function () {
 			return this.index;
 		}
 	}, {
+		key: 'prev',
+		value: function prev() {
+			this.goTo(this.index - 1);
+		}
+	}, {
+		key: 'next',
+		value: function next() {
+			this.goTo(this.index + 1);
+		}
+	}, {
 		key: 'goTo',
-		value: function goTo(index, skipAnims) {
+		value: function goTo(index, data) {
 			if (index === this.index || this.isChanging()) return;
 
-			var checkedIndex = this.checkLoop(index),
-			    event = this.createEvent(checkedIndex, skipAnims);
+			var checkedIndex = this.checkLoop(index);
+			var event = this.createEvent(checkedIndex, data);
 
 			if (checkedIndex === this.index) {
 				this.changing = false;
@@ -165,6 +164,8 @@ var SlideManager = function () {
 		key: 'done',
 		value: function done() {
 			this.changing = false;
+
+			if (this.options.auto) this.startAuto();
 		}
 
 		// Private functions
@@ -172,8 +173,12 @@ var SlideManager = function () {
 	}, {
 		key: 'events',
 		value: function events() {
-			this.el.addEventListener('mousedown', this.touchStart, false);
-			this.el.addEventListener('mouseup', this.touchEnd, false);
+			if (!this.el) return;
+
+			if (this.options.mouseSwipe) {
+				this.el.addEventListener('mousedown', this.touchStart, false);
+				this.el.addEventListener('mouseup', this.touchEnd, false);
+			}
 
 			this.el.addEventListener('touchstart', this.touchStart, false);
 			this.el.addEventListener('touchend', this.touchEnd, false);
@@ -195,16 +200,12 @@ var SlideManager = function () {
 	}, {
 		key: 'isGoingToX',
 		value: function isGoingToX() {
-			if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= this.diagonalMax || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= this.diagonalMax) return true;
-
-			return false;
+			return this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX <= this.diagonalMax || this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX <= this.diagonalMax;
 		}
 	}, {
 		key: 'isGoingToY',
 		value: function isGoingToY() {
-			if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= this.diagonalMax || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= this.diagonalMax) return true;
-
-			return false;
+			return this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY <= this.diagonalMax || this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY <= this.diagonalMax;
 		}
 	}, {
 		key: 'handleSwipe',
@@ -213,46 +214,37 @@ var SlideManager = function () {
 
 			if (this.options.vertical) {
 				if (this.touch.endY < this.touch.startY && this.touch.startY - this.touch.endY >= this.options.threshold) {
-					if (this.isGoingToX()) {
-						this.counter = 0;
-						this.callback(1);
-					}
+					if (this.isGoingToX()) this.callback(-1);
 				}
 				if (this.touch.endY > this.touch.startY && this.touch.endY - this.touch.startY >= this.options.threshold) {
-					if (this.isGoingToX()) {
-						this.counter = 0;
-						this.callback(-1);
-					}
+					if (this.isGoingToX()) this.callback(1);
 				}
 			} else {
 				if (this.touch.endX < this.touch.startX && this.touch.startX - this.touch.endX >= this.options.threshold) {
-					if (this.isGoingToY()) {
-						this.counter = 0;
-						this.callback(-1);
-					}
+					if (this.isGoingToY()) this.callback(-1);
 				}
 				if (this.touch.endX > this.touch.startX && this.touch.endX - this.touch.startX >= this.options.threshold) {
-					if (this.isGoingToY()) {
-						this.counter = 0;
-						this.callback(1);
-					}
+					if (this.isGoingToY()) this.callback(1);
 				}
 			}
 		}
 	}, {
 		key: 'startAuto',
 		value: function startAuto() {
-			if (this.paused) return;
+			var _this = this;
 
-			this.counter++;
+			this.intervalID = setInterval(function () {
+				if (_this.changing) return;
 
-			if (this.counter >= this.options.interval * 60) {
-				if (!this.changing) this.callback(-1);
+				_this.callback(-1);
+			}, this.options.interval * 1000);
+		}
+	}, {
+		key: 'stopAuto',
+		value: function stopAuto() {
+			clearInterval(this.intervalID);
 
-				this.counter = 0;
-			}
-
-			this.raf = requestAnimationFrame(this.startAuto);
+			this.intervalID = null;
 		}
 	}, {
 		key: 'isChanging',
@@ -287,17 +279,19 @@ var SlideManager = function () {
 	}, {
 		key: 'createEvent',
 		value: function createEvent(newIndex) {
-			var skipAnims = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+			var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 			var direction = newIndex > this.index ? 1 : -1;
 
-			if (this.index === 0 && newIndex === this.max - 1) direction = -1;else if (this.index === this.max - 1 && newIndex === 0) direction = 1;
+			if (this.max > 2) {
+				if (this.index === 0 && newIndex === this.max - 1) direction = -1;else if (this.index === this.max - 1 && newIndex === 0) direction = 1;
+			}
 
 			return {
 				new: newIndex,
 				previous: this.index,
 				direction: direction,
-				skipAnims: skipAnims
+				data: data
 			};
 		}
 	}, {
@@ -305,8 +299,8 @@ var SlideManager = function () {
 		value: function callback(delta) {
 			if (this.isChanging()) return;
 
-			var index = this.options.random ? this.newRandomIndex() : this.newIndex(delta),
-			    event = this.createEvent(index);
+			var index = this.options.random ? this.newRandomIndex() : this.newIndex(delta);
+			var event = this.createEvent(index);
 
 			if (index === this.index) {
 				this.changing = false;
@@ -314,7 +308,8 @@ var SlideManager = function () {
 				return;
 			}
 
-			if (!this.paused) this.counter = 0;
+			if (this.options.auto) this.stopAuto();
+
 			this.index = index;
 			this.options.callback(event);
 		}
@@ -2530,7 +2525,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	var slideWrapper = document.querySelector('#gallery');
 	var message = document.querySelector('#message');
 
-	var slider = new _SlideManager2.default(slideWrapper, {
+	var slider = new _SlideManager2.default({
+		el: slideWrapper,
 		loop: true,
 		auto: true,
 		callback: function callback(event) {
