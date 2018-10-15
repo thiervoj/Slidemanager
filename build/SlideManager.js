@@ -22,6 +22,7 @@ var SlideManager = function () {
 			return;
 		}
 
+		this.intervalFn = this.intervalFn.bind(this);
 		this.el = opt.el;
 		this.changing = false;
 		this.index = 0;
@@ -210,13 +211,16 @@ var SlideManager = function () {
 	}, {
 		key: 'startAuto',
 		value: function startAuto() {
-			var _this = this;
+			if (this.intervalID) this.stopAuto();
 
-			this.intervalID = setInterval(function () {
-				if (_this.changing) return;
+			this.intervalID = setInterval(this.intervalFn, this.options.interval * 1000);
+		}
+	}, {
+		key: 'intervalFn',
+		value: function intervalFn() {
+			if (this.changing) return;
 
-				_this.callback(-1);
-			}, this.options.interval * 1000);
+			this.callback(-1);
 		}
 	}, {
 		key: 'stopAuto',

@@ -6,6 +6,7 @@ export default class SlideManager {
 			return
 		}
 
+		this.intervalFn = this.intervalFn.bind(this)
 		this.el = opt.el
 		this.changing = false
 		this.index = 0
@@ -177,11 +178,15 @@ export default class SlideManager {
 	}
 
 	startAuto() {
-		this.intervalID = setInterval(() => {
-			if (this.changing) return
+		if (this.intervalID) this.stopAuto()
+		
+		this.intervalID = setInterval(this.intervalFn, this.options.interval * 1000)
+	}
 
-			this.callback(-1)
-		}, this.options.interval * 1000)
+	intervalFn() {
+		if (this.changing) return
+
+		this.callback(-1)
 	}
 
 	stopAuto() {
