@@ -1,6 +1,6 @@
 {
   "name": "slidemanager",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Slider manager 💫 Focused on animations",
   "main": "build/SlideManager.js",
   "repository": {
@@ -11,8 +11,7 @@
   "license": "MIT",
   "scripts": {
     "uglify": "uglifyjs build/SlideManager.js -cm > build/SlideManager.min.js",
-    "build": "babel src --out-file build/SlideManager.js --plugins transform-object-assign && npm run uglify",
-    "test": "browserify -t [babelify --presets es2015] example/app.js -o example/index.js"
+    "build": "babel src --out-file build/SlideManager.js --plugins transform-object-assign && yarn run uglify"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

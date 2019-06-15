@@ -17,12 +17,14 @@ var SlideManager = function () {
 		_classCallCheck(this, SlideManager);
 
 		if (!opt.callback) {
-			console.error('You must give a callback');
+			console.error('SlideManager error: You must give a callback');
 
 			return;
 		}
 
 		this.intervalFn = this.intervalFn.bind(this);
+		this.startAuto = this.startAuto.bind(this);
+		this.stopAuto = this.stopAuto.bind(this);
 		this.el = opt.el;
 		this.changing = false;
 		this.index = 0;
@@ -31,7 +33,7 @@ var SlideManager = function () {
 		if (opt.length > 0) this.max = opt.length;else if (this.el.children) this.max = this.el.children.length;
 
 		if (this.max === -1) {
-			console.error('You must give an element or a length');
+			console.error('SlideManager error: You must give an element or a length');
 
 			return;
 		}
@@ -82,7 +84,13 @@ var SlideManager = function () {
 		value: function init() {
 			if (this.max === 0) return null;
 
-			if (this.options.auto) this.startAuto();
+			if (this.options.auto) {
+				window.onblur = this.stopAuto;
+				window.onfocus = this.startAuto;
+
+				this.startAuto();
+			}
+
 			if (this.options.swipe) this.events();
 
 			return this;
@@ -104,7 +112,12 @@ var SlideManager = function () {
 				this.el.removeEventListener('touchend', this.touchEnd, false);
 			}
 
-			if (this.options.auto) this.stopAuto();
+			if (this.options.auto) {
+				window.onblur = null;
+				window.onfocus = null;
+
+				this.stopAuto();
+			}
 
 			return this;
 		}
