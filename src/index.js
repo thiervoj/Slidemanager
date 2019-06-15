@@ -67,8 +67,8 @@ export default class SlideManager {
 		if (this.max === 0) return null
 
 		if (this.options.auto) {
-			window.onblur = this.stopAuto
-			window.onfocus = this.startAuto
+			window.addEventListener('blur', this.stopAuto)
+			window.addEventListener('focus', this.startAuto)
 
 			this.startAuto()
 		}
@@ -94,8 +94,8 @@ export default class SlideManager {
 		}
 
 		if (this.options.auto) {
-			window.onblur = null
-			window.onfocus = null
+			window.removeEventListener('blur', this.stopAuto)
+			window.removeEventListener('focus', this.startAuto)
 
 			this.stopAuto()
 		}

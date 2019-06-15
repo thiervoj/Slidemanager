@@ -85,8 +85,8 @@ var SlideManager = function () {
 			if (this.max === 0) return null;
 
 			if (this.options.auto) {
-				window.onblur = this.stopAuto;
-				window.onfocus = this.startAuto;
+				window.addEventListener('blur', this.stopAuto);
+				window.addEventListener('focus', this.startAuto);
 
 				this.startAuto();
 			}
@@ -113,8 +113,8 @@ var SlideManager = function () {
 			}
 
 			if (this.options.auto) {
-				window.onblur = null;
-				window.onfocus = null;
+				window.removeEventListener('blur', this.stopAuto);
+				window.removeEventListener('focus', this.startAuto);
 
 				this.stopAuto();
 			}
