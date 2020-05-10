@@ -2,7 +2,15 @@
   "name": "slidemanager",
   "version": "0.4.8",
   "description": "Slider manager 💫 Focused on animations",
-  "main": "build/SlideManager.js",
+  "source": "src/slidemanager.js",
+  "main": "build/slidemanager.js",
+  "umd:main": "build/slidemanager.min.js",
+  "module": "build/slidemanager.module.js",
+  "unpkg": "build/slidemanager.min.js",
+  "files": [
+    "src",
+    "build"
+  ],
   "repository": {
     "url": "https://github.com/thiervoj/SlideManager.git",
     "type": "git"
@@ -10,19 +18,17 @@
   "author": "Jordan Thiervoz <jordanthiervoz@gmail.com> (https://jordanthiervoz.com)",
   "license": "MIT",
   "scripts": {
-    "uglify": "uglifyjs build/SlideManager.js -cm > build/SlideManager.min.js",
-    "build": "babel src --out-file build/SlideManager.js --plugins transform-object-assign && yarn run uglify"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-plugin-transform-object-assign": "^6.22.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babelify": "^7.3.0",
-    "browserify": "^14.4.0",
-    "uglify-js": "^3.0.26"
+    "clean": "rm -rf build/slidemanager.*",
+    "build": "microbundle --external none",
+    "watch": "microbundle watch --external none",
+    "lint": "eslint src"
   },
   "homepage": "https://github.com/thiervoj/SlideManager",
   "bugs": {
     "url": "https://github.com/thiervoj/SlideManager/issues"
+  },
+  "devDependencies": {
+    "eslint": "^7.0.0",
+    "microbundle": "^0.12.0"
   }
 }
