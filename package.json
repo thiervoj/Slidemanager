@@ -19,7 +19,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf build/slidemanager.*",
-    "build": "microbundle --external none",
+    "build": "npm run clean && microbundle --external none",
     "watch": "microbundle watch --external none",
     "lint": "eslint src"
   },
