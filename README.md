@@ -1,25 +1,27 @@
-# 👨🏼‍🔧 SlideManager
-Simple slide manager 💫 Focused on animations.
+# 👨🏼‍🔧 Slidemanager
+[![npm](https://img.shields.io/npm/v/slidemanager.svg)](https://www.npmjs.com/package/slidemanager)
+[![bundlephobia](https://img.shields.io/bundlephobia/minzip/slidemanager?label=bundle%20size)](https://bundlephobia.com/result?p=slidemanager)
+![NpmLicense](https://img.shields.io/npm/l/slidemanager.svg)
+
+Simple slide manager 💫 **Focused on animations**.
 
 ## Installation
-```
-yarn add slidemanager
+```bash
+npm add slidemanager
 ```
 
 ## Usage
 ```javascript
-import SlideManager from 'slidemanager'
+import Slidemanager from 'slidemanager'
 
-const slideWrapper = document.querySelector('#gallery')
-
-const slider = new SlideManager({
-  el: slideWrapper,
-  callback(event) {
+const slider = new Slidemanager({
+  el: document.querySelector('#gallery'),
+  callback({ current, previous, direction, done }) {
     // Your animations here
     // ...
 
     // Call done() when your animation is complete
-    this.done()
+    done()
   }
 })
 ```
@@ -51,12 +53,13 @@ const slider = new SlideManager({
 - 👌  `done` : call this function when your animations are over
 
 ## Callback
-The `callback` function has one parameter named `event` :
+The `callback` function receives a parameter containing the following properties :
 
-- `event.new` : New index
-- `event.previous` : Previous index
-- `event.direction` : 1 for next, -1 for previous
-- `event.data` : some data given when `goTo()` is called
+- `current` : New index
+- `previous` : Previous index
+- `direction` : 1 for next, -1 for previous
+- `done` : the function to call when you're done with your animations
+- `data` : some data that may be given from a call to `goTo()`
 
 ## License
 
