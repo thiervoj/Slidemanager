@@ -1,24 +1,15 @@
-export default class SlideManager {
+import 'raf-interval'
+
+export default class Slidemanager {
 	constructor(opt = {}) {
 		if (!opt.callback) {
-			console.error('SlideManager error: You must give a callback')
+			console.warn('Slidemanager: Missing `callback` property in constructor.')
 
 			return
 		}
 
-		this.intervalFn = this.intervalFn.bind(this)
-		this.startAuto = this.startAuto.bind(this)
-		this.stopAuto = this.stopAuto.bind(this)
-		this.el = opt.el
-		this.changing = false
-		this.index = 0
-		this.max = -1
-
-		if (opt.length > 0) this.max = opt.length
-		else if (this.el.children) this.max = this.el.children.length
-
 		if (this.max === -1) {
-			console.error('SlideManager error: You must give an element or a length')
+			console.warn('Slidemanager: Missing `el` or `length` property in constructor.')
 
 			return
 		}
@@ -33,16 +24,17 @@ export default class SlideManager {
 			interval: 5,
 			init: true,
 			swipe: true,
-			mouseSwipe: false,
+      mouseSwipe: false,
+      startAt: 0,
 			threshold: 60
 		}
 
-		this.options = Object.assign(defaults, opt)
-
-		if (opt.startAt !== this.index && opt.startAt > 0) {
-			if (opt.startAt > this.max) this.index = this.max
-			else this.index = opt.startAt
-		}
+    this.options = Object.assign(defaults, opt)
+    
+		this.el = opt.el
+		this.changing = false
+		this.max = opt.length > 0 ? opt.length : this.el.children ? this.el.children.length : -1
+		this.index = opt.startAt !== defaults.startAt ? Math.max(0, Math.min(opt.startAt, this.max)) : 0
 
 		this.intervalID = null
 
@@ -53,25 +45,27 @@ export default class SlideManager {
 			endY: 0
 		}
 
-		this.diagonalMax = 125
-
-		this.options.callback = this.options.callback.bind(this)
-		this.touchStart = this.touchStart.bind(this)
-		this.touchEnd = this.touchEnd.bind(this)
+    this.diagonalMax = 125
+    
+    this.bindMethods()
 
 		if (this.options.init) this.init()
-	}
+  }
+  
+  bindMethods() {
+    this.intervalFn = this.intervalFn.bind(this)
+		this.startAuto = this.startAuto.bind(this)
+		this.stopAuto = this.stopAuto.bind(this)
+		this.touchStart = this.touchStart.bind(this)
+    this.touchEnd = this.touchEnd.bind(this)
+    this.done = this.done.bind(this)
+  }
 
 	// Public functions
 	init() {
 		if (this.max === 0) return null
 
-		if (this.options.auto) {
-			window.addEventListener('blur', this.stopAuto)
-			window.addEventListener('focus', this.startAuto)
-
-			this.startAuto()
-		}
+		if (this.options.auto) this.startAuto()
 
 		if (this.options.swipe) this.events()
 
@@ -85,20 +79,15 @@ export default class SlideManager {
 
 		if (this.options.swipe && this.el) {
 			if (this.options.mouseSwipe) {
-				this.el.removeEventListener('mousedown', this.touchStart, false)
-				this.el.removeEventListener('mouseup', this.touchEnd, false)
+				this.el.removeEventListener('mousedown', this.touchStart)
+				this.el.removeEventListener('mouseup', this.touchEnd)
 			}
 
-			this.el.removeEventListener('touchstart', this.touchStart, false)
-			this.el.removeEventListener('touchend', this.touchEnd, false)
+			this.el.removeEventListener('touchstart', this.touchStart)
+			this.el.removeEventListener('touchend', this.touchEnd)
 		}
 
-		if (this.options.auto) {
-			window.removeEventListener('blur', this.stopAuto)
-			window.removeEventListener('focus', this.startAuto)
-
-			this.stopAuto()
-		}
+		if (this.options.auto) this.stopAuto()
 
 		return this
 	}
@@ -142,12 +131,12 @@ export default class SlideManager {
 		if (!this.el) return
 
 		if (this.options.mouseSwipe) {
-			this.el.addEventListener('mousedown', this.touchStart, false)
-			this.el.addEventListener('mouseup', this.touchEnd, false)
+			this.el.addEventListener('mousedown', this.touchStart)
+			this.el.addEventListener('mouseup', this.touchEnd)
 		}
 
-		this.el.addEventListener('touchstart', this.touchStart, false)
-		this.el.addEventListener('touchend', this.touchEnd, false)
+		this.el.addEventListener('touchstart', this.touchStart)
+		this.el.addEventListener('touchend', this.touchEnd)
 	}
 
 	touchStart(event) {
@@ -193,7 +182,7 @@ export default class SlideManager {
 	startAuto() {
 		if (this.intervalID) this.stopAuto()
 		
-		this.intervalID = setInterval(this.intervalFn, this.options.interval * 1000)
+		this.intervalID = window.setRafInterval(this.intervalFn, this.options.interval * 1000)
 	}
 
 	intervalFn() {
@@ -203,7 +192,7 @@ export default class SlideManager {
 	}
 
 	stopAuto() {
-		clearInterval(this.intervalID)
+		window.clearRafInterval(this.intervalID)
 
 		this.intervalID = null
 	}
@@ -243,10 +232,11 @@ export default class SlideManager {
 		}
 
 		return {
-			new: newIndex,
+			current: newIndex,
 			previous: this.index,
 			direction,
-			data
+      data,
+      done: this.done
 		}
 	}
 

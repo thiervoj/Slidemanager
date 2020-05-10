@@ -27,6 +27,9 @@
   "bugs": {
     "url": "https://github.com/thiervoj/SlideManager/issues"
   },
+  "dependencies": {
+    "raf-interval": "^0.3.0"
+  },
   "devDependencies": {
     "eslint": "^7.0.0",
     "microbundle": "^0.12.0"
