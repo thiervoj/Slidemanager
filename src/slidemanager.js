@@ -226,10 +226,8 @@ export default class Slidemanager {
   createEvent(newIndex, data) {
     let direction = newIndex > this.index ? 1 : -1
 
-    if (this.max > 2) {
-      if (this.index === 0 && newIndex === this.max - 1) direction = -1
-      else if (this.index === this.max - 1 && newIndex === 0) direction = 1
-    }
+    if (this.index === 0 && newIndex === this.max - 1) direction = -1
+    else if (this.index === this.max - 1 && newIndex === 0) direction = 1
 
     return {
       current: newIndex,
