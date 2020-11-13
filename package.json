@@ -4,9 +4,8 @@
   "description": "Slider manager 💫 Focused on animations",
   "source": "src/slidemanager.js",
   "main": "build/slidemanager.js",
-  "umd:main": "build/slidemanager.min.js",
   "module": "build/slidemanager.module.js",
-  "unpkg": "build/slidemanager.min.js",
+  "unpkg": "build/slidemanager.umd.js",
   "files": [
     "src",
     "build"
@@ -28,7 +27,7 @@
     "url": "https://github.com/thiervoj/SlideManager/issues"
   },
   "devDependencies": {
-    "eslint": "^7.0.0",
-    "microbundle": "^0.12.0"
+    "eslint": "^7.13.0",
+    "microbundle": "^0.12.4"
   }
 }
