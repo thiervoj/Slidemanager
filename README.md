@@ -61,6 +61,11 @@ The `callback` function receives a parameter containing the following properties
 - `done` : the function to call when you're done with your animations
 - `data` : some data that may be given from a call to `goTo()`
 
+## To do
+- Manage `stopAuto` during a transition
+- Rename `startAuto` and `stopAuto` to `play` and `stop`
+- Add `resume` and `pause` methods
+
 ## License
 
 MIT, see [LICENSE.md](https://github.com/thiervoj/SlideManager/blob/master/LICENSE.md) for details.
