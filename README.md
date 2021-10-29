@@ -49,7 +49,7 @@ const slider = new Slidemanager({
 - 👈  `prev` : goes to the previous slide
 - 👉  `next` : goes to the next slide
 - 🚗  `goTo(index, data)` : goes to the specified index, you can pass data which can be recovered in the callback
-- 🚦  `startAuto` / `stopAuto` : starts/stops the automatic sliding
+- 🚦  `start` / `stop` : starts/stops the automatic sliding
 - 👌  `done` : call this function when your animations are over
 
 ## Callback
@@ -62,10 +62,7 @@ The `callback` function receives a parameter containing the following properties
 - `data` : some data that may be given from a call to `goTo()`
 
 ## To do
-- Manage `stopAuto` during a transition (when `done` has not been called yet)
-- Rename `startAuto` and `stopAuto` to `play` and `stop`
 - Add `resume` and `pause` methods
-- Call `stopAuto` in `goTo` method
 
 ## License
 
